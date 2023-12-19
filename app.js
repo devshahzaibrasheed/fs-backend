@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const cors = require("cors");
 
+const userRouter = require("./routes/userRoutes");
+
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: "*", credentials: true, allowedHeaders: ["Content-Type", "Authorization"] }));
@@ -10,11 +12,12 @@ app.use(cors({ origin: "*", credentials: true, allowedHeaders: ["Content-Type", 
 port = process.env.PORT;
 database = process.env.DATABASE;
 
+//routes
+app.use("/api/v1/users", userRouter);
+
 //mongodb connection
 mongoose
   .connect(database, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
   })
   .then(() => console.log("DB connection successful!"));
 

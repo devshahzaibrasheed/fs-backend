@@ -1,0 +1,32 @@
+{
+  "name": "frontshare",
+  "version": "1.0.0",
+  "description": "FrontShare Website",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zatacka/FrontShare-Node.git"
+  },
+  "author": "Zatacka",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zatacka/FrontShare-Node/issues"
+  },
+  "homepage": "https://github.com/Zatacka/FrontShare-Node#readme",
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3",
+    "validator": "^13.11.0"
+  }
+}

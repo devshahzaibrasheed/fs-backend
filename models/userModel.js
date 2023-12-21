@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema(
       required: [true, "Email is required!"],
       validate: [validator.isEmail, "Please provide a valid email"]
     },
+    email_verified: {
+      type: Boolean,
+      default: false,
+    },
     password: {
       type: String,
       required: [true, "Password is Required"],
@@ -33,15 +37,20 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    userType: {
+    role: {
       type: String,
-      enum: ["User", "Admin"],
-      default: "User",
+      enum: ["user", "admin", "employee"],
+      default: "user",
     },
     userStatus: {
       type: String,
-      enum: ["Active", "Inactive"],
+      enum: ["active", "inactive"],
       default: "Active",
+    },
+    plan: {
+      type: String,
+      enum: ["basic", "pro_monthly", "pro_annually"],
+      default: "basic",
     },
     url: {
       type: String

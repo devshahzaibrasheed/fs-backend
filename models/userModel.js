@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
     userStatus: {
       type: String,
       enum: ["active", "inactive"],
-      default: "Active",
+      default: "active",
     },
     plan: {
       type: String,

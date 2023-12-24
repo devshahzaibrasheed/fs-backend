@@ -64,3 +64,30 @@ exports.login = async (req, res) => {
     return res.status(422).json({ error: error.message });
   }
 };
+
+exports.protect = async (req, res, next) => {
+  let token = req.headers.authorization;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return res.status(401).json({ error: "User not found" });
+      }
+      req.user = currentUser;
+      res.locals.user = currentUser;
+      return next();
+    } catch (err) {
+      return res.status(401).json({ error: "Token is not valid" });
+    }
+  }
+
+  return res
+    .status(401)
+    .json({ error: "You are not logged in! Please log in to get access" });
+};
+
+exports.currentUser = async (req, res) => {
+  res.status(200).json({user: req.user});
+}

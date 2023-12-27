@@ -5,6 +5,9 @@ const authController = require("./../controllers/authController");
 router
   .post("/login", authController.login)
   .post("/signup", authController.register)
+  .post("/forgotPassword", authController.forgotPassword)
+  .post("/checkValidity/:token", authController.checkValidity)
+  .patch("/resetPassword/:token", authController.resetPassword)
 
 router
   .use(authController.protect)

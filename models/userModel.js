@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema(
       required: [true, "Email is required!"],
       validate: [validator.isEmail, "Please provide a valid email"]
     },
-    email_verified: {
+    emailVerified: {
       type: Boolean,
       default: false,
     },
@@ -33,10 +33,8 @@ const userSchema = new mongoose.Schema(
       ],
       select: false,
     },
-    resetPasswordToken: {
-      type: String,
-      required: false,
-    },
+    resetPasswordToken: String,
+    passwordResetExpires: Date,
     role: {
       type: String,
       enum: ["user", "admin", "employee"],
@@ -53,6 +51,9 @@ const userSchema = new mongoose.Schema(
       default: "basic",
     },
     url: {
+      type: String
+    },
+    verificationToken: {
       type: String
     }
   },

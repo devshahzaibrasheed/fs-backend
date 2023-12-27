@@ -1,5 +1,6 @@
 const User = require("./../models/userModel");
 const crypto = require("crypto");
+const Mailer = require("../utils/emails");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
@@ -12,10 +13,12 @@ const signToken = (id) => {
 exports.register = async (req, res) => {
   const user = new User(req.body);
   user.url = crypto.randomBytes(8).toString("hex");
+  user.verificationToken = crypto.randomBytes(20).toString("hex");
   const token = signToken(user._id);
 
   try {
     await user.save();
+    await Mailer.verificationEmail(user);
 
     res.status(201).json({
       message: "SignUp successful",
@@ -90,4 +93,73 @@ exports.protect = async (req, res, next) => {
 
 exports.currentUser = async (req, res) => {
   res.status(200).json({user: req.user});
-}
+};
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({error: 'User not found'})
+    }
+
+    const resetToken = crypto.randomBytes(20).toString("hex");
+
+    user.resetPasswordToken = resetToken;
+    user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
+    await Mailer.forgetPasswordEmail(user, email, resetToken);
+
+    res.json({ message: "Password reset email sent" });
+  } catch (error) {
+    return res.status(422).json({ error: error.message });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { newPassword, confirmNewPassword } = req.body;
+
+    const user = await User.findOne({
+      resetPasswordToken: token
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "Invalid reset token" });
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      return res
+        .status(400)
+        .json({ error: "New password and confirm password do not match" });
+    }
+
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    await user.save();
+    await Mailer.resetPasswordEmail(user);
+
+    res.json({ message: "Password reset successful" });
+  } catch (error) {
+    res.status(422).json({ error: error.message });
+  }
+};
+
+exports.checkValidity = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      passwordResetExpires: { $gt: Date.now() }
+    });
+
+    if (user) {
+      return res.status(200).json({ status: "Valid" });
+    } else {
+      return res.status(404).json({ status: "Not Valid" });
+    }
+  } catch (error) {
+    res.status(422).json({ error: error.message });
+  }
+};

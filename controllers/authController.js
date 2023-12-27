@@ -95,6 +95,27 @@ exports.currentUser = async (req, res) => {
   res.status(200).json({user: req.user});
 };
 
+exports.verify = async (req, res, next) => {
+  try {
+    const { verification_token } = req.body;
+    const user = await User.findOne({ verificationToken: verification_token });
+
+    if (!user) {
+      return res.status(404).json({message: "Token not valid"});
+    }
+ 
+    user.emailVerified = true;
+    user.verificationToken = undefined
+    await user.save()
+
+    res.status(200).json({
+      message: "Account verified successfully",
+    });
+  } catch (err) {
+    res.status(422).json({ error: err.message });
+  }
+};
+
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;

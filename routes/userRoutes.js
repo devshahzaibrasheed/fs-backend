@@ -8,6 +8,7 @@ router
   .post("/forgotPassword", authController.forgotPassword)
   .post("/checkValidity/:token", authController.checkValidity)
   .patch("/resetPassword/:token", authController.resetPassword)
+  .post("/verify", authController.verify);
 
 router
   .use(authController.protect)

@@ -65,7 +65,7 @@ exports.verificationEmail = async (user) => {
               Welcome to FrontShare<br><br>
               To continue access to your Frontshare account, click on the button below to verify your email.<br><br>
               <button style="background-color:#725574; border:none; color:white; padding: 15px 32px; text-align:center; text-decoration:none; display:inline-block; font-size: 16px; margin: 4px 2px; cursor:pointer;">
-              <a href="${process.env.BASE_URL}?verification_token=${user.verificationToken}" style="color:white; text-decoration:none;">Click here to verify your email</a>.
+              <a href="${process.env.BASE_URL}/auth/verify-email?verification_token=${user.verificationToken}" style="color:white; text-decoration:none;">Click here to verify your email</a>.
               </button>
               <p>Thanks,</p>
               <p>The FrontShare Team</p>`

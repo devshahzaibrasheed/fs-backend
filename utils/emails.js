@@ -13,7 +13,7 @@ exports.forgetPasswordEmail = async (user, email, resetToken) => {
               <p>If you didn't make this request, please contact our support team right away at info@frontshare.com</p>
               <p>If you need to reset your password, please click the button below to proceed.</p>
               <button style="background-color:#725574; border:none; color:white; padding: 15px 32px; text-align:center; text-decoration:none; display:inline-block; font-size: 16px; margin: 4px 2px; cursor:pointer;">
-              <a href="${process.env.BASE_URL}?reset_password=${resetToken}" style="color:white; text-decoration:none;">Click here to reset your password</a>
+              <a href="${process.env.BASE_URL}/reset-password/${resetToken}" style="color:white; text-decoration:none;">Click here to reset your password</a>
               </button>
               <p>Thanks,</p>
               <p>The FrontShare Team</p>`

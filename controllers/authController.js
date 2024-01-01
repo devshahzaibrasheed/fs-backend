@@ -180,9 +180,9 @@ exports.checkValidity = async (req, res) => {
     });
 
     if (user) {
-      return res.status(200).json({ status: "Valid" });
+      return res.status(200).json({ valid: true });
     } else {
-      return res.status(404).json({ status: "Not Valid" });
+      return res.status(404).json({ valid: false });
     }
   } catch (error) {
     res.status(422).json({ error: error.message });

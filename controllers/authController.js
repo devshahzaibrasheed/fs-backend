@@ -148,7 +148,7 @@ exports.resetPassword = async (req, res) => {
 
     const user = await User.findOne({
       resetPasswordToken: token
-    });
+    }).select("+password");
 
     if (!user) {
       return res.status(404).json({ error: "Invalid reset token" });
@@ -158,6 +158,12 @@ exports.resetPassword = async (req, res) => {
       return res
         .status(400)
         .json({ error: "New password and confirm password do not match" });
+    }
+
+    if (await user.correctPassword(newPassword, user.password)) {
+      return res
+        .status(400)
+        .json({ error: "New password can not be same as current password!" });
     }
 
     user.password = newPassword;

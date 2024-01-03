@@ -55,7 +55,16 @@ const userSchema = new mongoose.Schema(
     },
     verificationToken: {
       type: String
-    }
+    },
+    activityStatus: {
+      type: Boolean,
+      default: true
+    },
+    recentActivity: {
+      onlineAt: {
+        type: Date
+      }
+    },
   },
   {
     timestamps: true,

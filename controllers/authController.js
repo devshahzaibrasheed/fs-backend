@@ -79,9 +79,13 @@ exports.protect = async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const currentUser = await User.findById(decoded.id);
+
       if (!currentUser) {
         return res.status(401).json({ error: "User not found" });
       }
+      
+      currentUser.recentActivity.onlineAt = new Date();
+      currentUser.save();
       req.user = currentUser;
       res.locals.user = currentUser;
       return next();

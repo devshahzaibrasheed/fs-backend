@@ -22,6 +22,8 @@
   },
   "dependencies": {
     "aws-sdk": "^2.1526.0",
+    "axios": "^1.6.3",
+    "google-auth-library": "^9.2.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",

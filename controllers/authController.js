@@ -1,4 +1,5 @@
 const User = require("./../models/userModel");
+const { googleStrategy } = require('./../modules/googleStrategy');
 const crypto = require("crypto");
 const Mailer = require("../utils/emails");
 const jwt = require("jsonwebtoken");
@@ -8,6 +9,57 @@ const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
+};
+
+exports.googleLogin = async (req, res) => {
+  try {
+    const { access_token } = req.body
+    console.log("Access Token", access_token)
+    const googleResponse = await googleStrategy.validate(access_token)
+
+    const {
+      payload: { family_name, email, picture, given_name },
+      userid,
+    } = googleResponse
+
+    const found = await User.findOne({email})
+
+    if (found) {
+      console.log("Already Signed Up")
+      const token = signToken(found._id);
+      res.status(200).json({
+        message: "SignIn successful",
+        token: token,
+        user: found
+      });
+    }
+    else{
+      const user_body = {
+        email: email,
+        firstName: given_name,
+        lastName: family_name,
+        emailVerified: true,
+        verificationToken: undefined,
+        url: crypto.randomBytes(8).toString("hex"),
+        image: picture
+      }
+      const user = new User(user_body)
+      const token = signToken(user._id);
+      await user.save({validateBeforeSave: false});
+
+      res.status(200).json({
+        message: "SignUp successful",
+        token: token,
+        user: user
+      });
+    }
+
+  } catch (error) {
+    // console.log(error)
+    return res.status(422).json({
+      error: error
+    });
+  }
 };
 
 exports.register = async (req, res) => {

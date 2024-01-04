@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const cors = require("cors");
+const authController = require("./controllers/authController");
 
 const userRouter = require("./routes/userRoutes");
 
@@ -14,6 +15,7 @@ database = process.env.DATABASE;
 
 //routes
 app.use("/api/v1/users", userRouter);
+app.post('/auth/google/callback/sign-in', authController.googleLogin)
 
 //mongodb connection
 mongoose

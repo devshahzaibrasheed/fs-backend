@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide your last name"],
     },
+    image: {type: String},
     email: {
       type: String,
       unique: [true, "Email already exists"],

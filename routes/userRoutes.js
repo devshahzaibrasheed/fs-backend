@@ -14,6 +14,7 @@ router
 router
   .use(authController.protect)
   .get("/current_user", authController.currentUser)
+  .patch("/update_password", authController.updatePassword)
   .get("/:id", userController.getUser)
   .patch("/:id", userController.updateUser)
   .delete("/:id", userController.deleteUser)

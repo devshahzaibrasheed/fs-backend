@@ -130,14 +130,14 @@ exports.protect = async (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const currentUser = await User.findById(decoded.id);
+      const currentUser = await User.findById(decoded.id).select("+password");
 
       if (!currentUser) {
         return res.status(401).json({ error: "User not found" });
       }
       
-      currentUser.recentActivity.onlineAt = new Date();
-      currentUser.save();
+      // currentUser.recentActivity.onlineAt = new Date();
+      // currentUser.save();
       req.user = currentUser;
       res.locals.user = currentUser;
       return next();
@@ -248,5 +248,27 @@ exports.checkValidity = async (req, res) => {
     }
   } catch (error) {
     res.status(422).json({ error: error.message });
+  }
+};
+
+exports.updatePassword = async (req, res) => {
+  const user = req.user;
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+
+  try {
+    if (!(await user.correctPassword(currentPassword, user.password))) {
+      res.status(400).json({ error: "Current Password is incorrect" });
+    } else if (newPassword !== confirmPassword) {
+      res.status(400).json({ error: "New Password and Confirm Password fields must match" });
+    } else if (currentPassword === newPassword) {
+      res.status(400).json({ error: "New password must be different from current password" });
+    } else {
+      user.password = newPassword;
+      await user.save();
+      const token = signToken(user._id);
+      res.status(200).json({ message: "Your password was successfully updated", token });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

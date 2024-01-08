@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const catchAsync = require('./../utils/catchAsync')
 const { stringify } = require("querystring");
+const axios = require('axios');
 
 
 const signToken = (id) => {

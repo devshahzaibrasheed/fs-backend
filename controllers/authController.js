@@ -309,21 +309,13 @@ exports.facebookLogin = catchAsync(async (req, res)=>{
           await user.save({ validateBeforeSave: false });
       }
       const token = signToken(user._id);
-      const cookieOptions = {
-        expires: new Date(
-          Date.now() + process.env.JWT_COOKIE_EXPIRESIN * 24 * 60 * 60 * 1000
-        ),
-        httpOnly: false,
-      };
-
-      if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
-
-      res.cookie("jwt", token, cookieOptions);
       res.status(200).json({
         status: "success",
         token,
         user
       });
+    } else {
+      res.status(422).json({error: "something went wrong"});
     }
   }
   catch(err){

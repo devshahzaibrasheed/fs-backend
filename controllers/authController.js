@@ -4,6 +4,9 @@ const crypto = require("crypto");
 const Mailer = require("../utils/emails");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const catchAsync = require('./../utils/catchAsync')
+const { stringify } = require("querystring");
+
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -271,4 +274,93 @@ exports.updatePassword = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+exports.facebookLoginUrl = (req, res,) => {
+  const stringifiedParams = stringify({
+    client_id: process.env.FACEBOOK_APP_ID,
+    redirect_uri: process.env.FACEBOOK_REDIRECT_URL,
+    scope: ['email', 'public_profile'].join(','), // comma seperated string
+    response_type: 'code',
+    auth_type: 'rerequest',
+    display: 'popup',
+  });
+  res.status(200).json({ status: "success", data: { url: `https://www.facebook.com/v4.0/dialog/oauth?${stringifiedParams}` } });
+};
+
+exports.facebookLogin = catchAsync(async (req, res)=>{
+  try {
+    const urlParams = req.query;
+    const access_token = await getAccessTokenFromCode(urlParams.code)
+    data = await getFacebookUserData(access_token);
+    if(data.email) {
+      var user = await User.findOne({ email: data.email })
+      if (!user){
+        var user = await new User({
+          emailVerified: true,
+          image: req.body.image,
+          firstName: data.first_name,
+          lastName: data.last_name,
+          url: crypto.randomBytes(8).toString("hex"),
+          email: data.email,
+          verificationToken: undefined
+          })
+          await user.save({ validateBeforeSave: false });
+      }
+      const token = signToken(user._id);
+      const cookieOptions = {
+        expires: new Date(
+          Date.now() + process.env.JWT_COOKIE_EXPIRESIN * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: false,
+      };
+
+      if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+
+      res.cookie("jwt", token, cookieOptions);
+      res.status(200).json({
+        status: "success",
+        token,
+        data: {
+          user,
+        },
+      });
+    }
+  }
+  catch(err){
+    res.status(422).json({ error: err.message });
+  }
+});
+
+async function getAccessTokenFromCode(code) {
+  try {
+  const response = await axios({
+    url: 'https://graph.facebook.com/v4.0/oauth/access_token',
+    method: 'get',
+    params: {
+      client_id: process.env.FACEBOOK_APP_ID,
+      client_secret: process.env.FACEBOOK_APP_SECRET,
+      redirect_uri: process.env.FACEBOOK_REDIRECT_URL,
+      scope: ['email', 'public_profile'].join(','),
+      code,
+    },
+  });
+  return response.data.access_token;
+  }
+  catch(error) {
+    console.log(error);
+    return 'response.data.access_token;'
+  }
+};
+
+async function getFacebookUserData(access_token) {
+  const response  = await axios({
+    url: 'https://graph.facebook.com/me',
+    method: 'get',
+    params: {
+      fields: ['id', 'email', 'first_name', 'last_name'].join(','),
+      access_token: access_token,
+    },
+  });
+  return response.data;
 };

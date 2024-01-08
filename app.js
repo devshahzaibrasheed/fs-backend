@@ -17,6 +17,10 @@ database = process.env.DATABASE;
 app.use("/api/v1/users", userRouter);
 app.post('/auth/google/callback/sign-in', authController.googleLogin)
 
+// Facebook Login Routes
+app.get("/facebook/login", authController.facebookLogin);
+app.get("/facebook/loginurl", authController.facebookLoginUrl);
+
 //mongodb connection
 mongoose
   .connect(database, {

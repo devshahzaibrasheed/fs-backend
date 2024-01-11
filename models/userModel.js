@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema(
     state: String,
     zipCode: String,
     timezone: String,
-    type: String
+    currency: String
   },
   {
     timestamps: true,

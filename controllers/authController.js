@@ -70,6 +70,7 @@ exports.register = async (req, res) => {
   const user = new User(req.body);
   user.url = crypto.randomBytes(8).toString("hex");
   user.verificationToken = crypto.randomBytes(20).toString("hex");
+  user.joinedDate = new Date();
   const token = signToken(user._id);
 
   try {

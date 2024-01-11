@@ -66,6 +66,20 @@ const userSchema = new mongoose.Schema(
         type: Date
       }
     },
+    banner: String,
+    country: String,
+    phone: String,
+    dateOfBirth: Date,
+    joinedDate: Date,
+    gender: {
+      type: String,
+      enum: ['male', 'female']
+    },
+    address: String,
+    state: String,
+    zipCode: String,
+    timezone: String,
+    type: String
   },
   {
     timestamps: true,

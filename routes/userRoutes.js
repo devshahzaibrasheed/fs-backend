@@ -13,6 +13,7 @@ router
 
 router
   .use(authController.protect)
+  .get("/search", userController.searchUsers)
   .get("/current_user", authController.currentUser)
   .patch("/update_password", authController.updatePassword)
   .get("/:id", userController.getUser)

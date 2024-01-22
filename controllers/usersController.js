@@ -54,3 +54,25 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.searchUsers = async (req, res) => {
+  try {
+    const { key } = req.query;
+
+    const users = await User.find({
+      _id: { $ne: req.user._id },
+      $or: [
+        { firstName: { $regex: key, $options: "i" } },
+        { lastName: { $regex: key, $options: "i" } },
+        { email: { $regex: key, $options: "i" } }
+      ],
+    });
+
+    res.status(200).json({
+      results: users.length,
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

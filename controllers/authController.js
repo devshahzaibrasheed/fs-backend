@@ -45,7 +45,8 @@ exports.googleLogin = async (req, res) => {
         emailVerified: true,
         verificationToken: undefined,
         url: crypto.randomBytes(8).toString("hex"),
-        image: picture
+        image: picture,
+        password: ""
       }
       const user = new User(user_body)
       const token = signToken(user._id);

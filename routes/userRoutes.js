@@ -16,6 +16,7 @@ router
   .get("/search", userController.searchUsers)
   .get("/current_user", authController.currentUser)
   .patch("/update_password", authController.updatePassword)
+  .get("/url/:url", userController.getUserByUrl)
   .get("/:id", userController.getUser)
   .patch("/:id", userController.updateUser)
   .delete("/:id", userController.deleteUser)

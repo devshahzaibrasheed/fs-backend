@@ -7,6 +7,6 @@ const authController = require("../controllers/authController");
 router
   .use(authController.protect)
   .post("/", followController.follow)
-  .post("/", followController.unfollow)
+  .post("/unfollow", followController.unfollow)
 
 module.exports = router;

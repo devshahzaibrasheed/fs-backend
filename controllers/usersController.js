@@ -18,7 +18,28 @@ exports.getUser = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    return res.status(200).json({status: "success", data: user });
+    //whether current user is following this user or not
+    const is_following = await Follow.findOne({
+      follower: req.user._id,
+      following: user._id
+    });
+
+    //whether current user is followed by this user or not
+    const is_follower = await Follow.findOne({
+      follower: user._id,
+      following: req.user._id
+    });
+
+    let following = is_following ? true : false;
+    let follower = is_follower ? true : false;
+
+    const modifiedUser = {
+      ...user.toObject(),
+      following,
+      follower
+    };
+
+    return res.status(200).json({status: "success", data: modifiedUser });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -36,7 +36,7 @@ exports.follow = async (req, res) => {
 
     //number of followers
     const followers_count = await Follow.countDocuments({
-      following: req.user._id
+      following: user._id
     });
 
     //whether current user is followed by this user or not
@@ -47,7 +47,7 @@ exports.follow = async (req, res) => {
 
     //number of followings
     const followings_count = await Follow.countDocuments({
-      follower: req.user._id
+      follower: user._id
     });
 
     let following = is_following ? true : false;
@@ -95,7 +95,7 @@ exports.unfollow = async (req, res) => {
 
     //number of followers
     const followers_count = await Follow.countDocuments({
-      following: req.user._id
+      following: user._id
     });
 
     //whether current user is followed by this user or not
@@ -106,7 +106,7 @@ exports.unfollow = async (req, res) => {
 
     //number of followings
     const followings_count = await Follow.countDocuments({
-      follower: req.user._id
+      follower: user._id
     });
 
     let following = is_following ? true : false;

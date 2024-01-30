@@ -1,4 +1,5 @@
 const User = require("./../models/userModel");
+const Follow = require("./../models/followModel");
 const { googleStrategy } = require('./../modules/googleStrategy');
 const crypto = require("crypto");
 const Mailer = require("../utils/emails");
@@ -158,7 +159,25 @@ exports.protect = async (req, res, next) => {
 };
 
 exports.currentUser = async (req, res) => {
-  res.status(200).json({user: req.user});
+  const user = req.user;
+
+  //number of followers
+  const followers_count = await Follow.countDocuments({
+    following: user._id
+  });
+
+  //number of followings
+  const followings_count = await Follow.countDocuments({
+    follower: user._id
+  });
+
+  const modifiedUser = {
+    ...user.toObject(),
+    followers_count,
+    followings_count
+  };
+
+  res.status(200).json({user: modifiedUser});
 };
 
 exports.verify = async (req, res, next) => {

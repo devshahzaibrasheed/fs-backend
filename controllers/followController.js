@@ -34,10 +34,20 @@ exports.follow = async (req, res) => {
       following: user._id
     });
 
+    //number of followers
+    const followers_count = await Follow.countDocuments({
+      following: req.user._id
+    });
+
     //whether current user is followed by this user or not
     const is_follower = await Follow.findOne({
       follower: user._id,
       following: req.user._id
+    });
+
+    //number of followings
+    const followings_count = await Follow.countDocuments({
+      follower: req.user._id
     });
 
     let following = is_following ? true : false;
@@ -46,7 +56,9 @@ exports.follow = async (req, res) => {
     const modifiedUser = {
       ...user.toObject(),
       following,
-      follower
+      follower,
+      followers_count,
+      followings_count
     };
 
     res.status(201).json({ message: "Followed Successfully", user: modifiedUser });
@@ -81,10 +93,20 @@ exports.unfollow = async (req, res) => {
       following: user._id
     });
 
+    //number of followers
+    const followers_count = await Follow.countDocuments({
+      following: req.user._id
+    });
+
     //whether current user is followed by this user or not
     const is_follower = await Follow.findOne({
       follower: user._id,
       following: req.user._id
+    });
+
+    //number of followings
+    const followings_count = await Follow.countDocuments({
+      follower: req.user._id
     });
 
     let following = is_following ? true : false;
@@ -93,7 +115,9 @@ exports.unfollow = async (req, res) => {
     const modifiedUser = {
       ...user.toObject(),
       following,
-      follower
+      follower,
+      followers_count,
+      followings_count
     };
 
     res.status(200).json({ message: "Unfollowed Successfully", user: modifiedUser });

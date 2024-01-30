@@ -125,3 +125,37 @@ exports.unfollow = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getFollowers = async (req, res) => {
+  try {
+    const user = await findUserById(req.params.id);
+
+    const followers = await Follow.find({ following: user._id })
+      .populate("follower", "firstName lastName image")
+      .lean();
+
+    const followerList = followers.map(({ follower }) => follower);
+    const totalFollowers = followers.length;
+
+    res.status(200).json({ totalFollowers, followers: followerList });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getFollowing = async (req, res) => {
+  try {
+    const user = await findUserById(req.params.id);
+
+    const following = await Follow.find({ follower: user._id })
+      .populate("following", "firstName lastName image")
+      .lean();
+
+    const followingList = following.map(({ following }) => following);
+    const totalFollowing = following.length;
+
+    res.status(200).json({ totalFollowing, following: followingList });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

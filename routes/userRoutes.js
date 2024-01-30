@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const authController = require("./../controllers/authController");
 const userController = require("./../controllers/usersController");
+const followController = require("./../controllers/followController");
 
 router
   .post("/login", authController.login)
@@ -13,6 +14,8 @@ router
 
 router
   .use(authController.protect)
+  .get("/:id/followers", followController.getFollowers)
+  .get("/:id/following", followController.getFollowing)
   .get("/search", userController.searchUsers)
   .get("/current_user", authController.currentUser)
   .patch("/update_password", authController.updatePassword)

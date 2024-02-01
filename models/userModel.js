@@ -79,7 +79,13 @@ const userSchema = new mongoose.Schema(
     state: String,
     zipCode: String,
     timezone: String,
-    currency: String
+    currency: String,
+    bio: String,
+    displayName: String,
+    useRealName: {
+      type: Boolean,
+      default: true
+    }
   },
   {
     timestamps: true,

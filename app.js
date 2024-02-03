@@ -6,6 +6,7 @@ const authController = require("./controllers/authController");
 
 const userRouter = require("./routes/userRoutes");
 const followRouter = require("./routes/followRoutes");
+const notificationRouter = require("./routes/notificationRoutes");
 
 const app = express();
 app.use(express.json());
@@ -17,6 +18,7 @@ database = process.env.DATABASE;
 //routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/follows", followRouter);
+app.use("/api/v1/notifications", notificationRouter);
 app.post('/auth/google/callback/sign-in', authController.googleLogin)
 
 // Facebook Login Routes

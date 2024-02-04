@@ -145,7 +145,20 @@ exports.getFollowers = async (req, res) => {
       .populate("follower", "firstName lastName image url useRealName displayName")
       .lean();
 
-    const followerList = followers.map(({ follower }) => follower);
+      //if the user is also following back then friends else follow back
+      const followerList = await Promise.all(
+        followers.map(async ({ follower }) => {
+          const isFriend = await Follow.findOne({
+            follower: user._id,
+            following: follower._id,
+          });
+      
+          return {
+            ...follower,
+            status: isFriend ? 'Friends' : 'Follow Back',
+          };
+        })
+      );
     const totalFollowers = followers.length;
 
     res.status(200).json({ totalFollowers, followers: followerList });
@@ -166,7 +179,21 @@ exports.getFollowing = async (req, res) => {
       .populate("following", "firstName lastName image url useRealName displayName")
       .lean();
 
-    const followingList = following.map(({ following }) => following);
+      //if the other user is also following then friends else following
+      const followingList = await Promise.all(
+        following.map(async ({ following }) => {
+          const isFriend = await Follow.findOne({
+            follower: following._id,
+            following: user._id,
+          });
+      
+          return {
+            ...following,
+            status: isFriend ? 'Friends' : 'Following',
+          };
+        })
+      );
+
     const totalFollowing = following.length;
 
     res.status(200).json({ totalFollowing, following: followingList });

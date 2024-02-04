@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const Notification = require("../models/notificationModel");
 const { pagination } = require("../utils/pagination");
+const timeago = require('timeago.js');
 
 exports.getNotifications = async (req, res) => {
   try {
@@ -10,9 +11,14 @@ exports.getNotifications = async (req, res) => {
     .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit)
-    .exec();;
+    .exec();
 
-    return res.status(200).json({ status: "success", data: notifications });
+    const formattedNotifications = notifications.map((notification) => ({
+      ...notification.toObject(),
+      time: timeago.format(notification.createdAt, 'en_US'),
+    }));
+
+    return res.status(200).json({ status: "success", data: formattedNotifications });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

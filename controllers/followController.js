@@ -142,7 +142,7 @@ exports.getFollowers = async (req, res) => {
     }
 
     const followers = await Follow.find({ following: user._id })
-      .populate("follower", "firstName lastName image url")
+      .populate("follower", "firstName lastName image url useRealName displayName")
       .lean();
 
     const followerList = followers.map(({ follower }) => follower);
@@ -163,7 +163,7 @@ exports.getFollowing = async (req, res) => {
     }
 
     const following = await Follow.find({ follower: user._id })
-      .populate("following", "firstName lastName image url")
+      .populate("following", "firstName lastName image url useRealName displayName")
       .lean();
 
     const followingList = following.map(({ following }) => following);

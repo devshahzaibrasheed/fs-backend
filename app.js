@@ -2,6 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const cors = require("cors");
+const socketIO = require("socket.io");
+const http = require("http");
+
 const authController = require("./controllers/authController");
 
 const userRouter = require("./routes/userRoutes");
@@ -19,11 +22,31 @@ database = process.env.DATABASE;
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/follows", followRouter);
 app.use("/api/v1/notifications", notificationRouter);
+//google signin
 app.post('/auth/google/callback/sign-in', authController.googleLogin)
 
 // Facebook Login Routes
 app.get("/facebook/login", authController.facebookLogin);
 app.get("/facebook/loginurl", authController.facebookLoginUrl);
+
+//socket
+const server = http.createServer(app);
+const io = socketIO(server, {
+  cors: {
+    origin: "*"
+  }
+});
+
+io.on("connection", (socket) => {
+  console.log("New connection established.");
+
+  socket.on("sendNotification", (data) => {
+    socket.broadcast.emit("receiveNotification", {
+      senderId: socket.id,
+      data: data
+    });
+  });
+});
 
 //mongodb connection
 mongoose
@@ -32,6 +55,6 @@ mongoose
   .then(() => console.log("DB connection successful!"));
 
 //start server on port 3000
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

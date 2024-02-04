@@ -156,6 +156,7 @@ exports.getFollowers = async (req, res) => {
           return {
             ...follower,
             status: isFriend ? 'Friends' : 'Follow Back',
+            name: follower.useRealName ? `${follower.firstName} ${follower.lastName}` : follower.displayName
           };
         })
       );
@@ -186,10 +187,11 @@ exports.getFollowing = async (req, res) => {
             follower: following._id,
             following: user._id,
           });
-      
+
           return {
             ...following,
             status: isFriend ? 'Friends' : 'Following',
+            name: following.useRealName ? `${following.firstName} ${following.lastName}` : following.displayName
           };
         })
       );

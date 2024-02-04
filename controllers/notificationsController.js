@@ -48,3 +48,16 @@ exports.deleteNotification = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.markAsRead = async (req, res) => {
+  try {
+    await Notification.updateMany(
+      { user: req.user._id },
+      { $set: { read: true } }
+    );
+
+    return res.status(200).json({ status: "success", message: "Notifications Marked as read" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

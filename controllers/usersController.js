@@ -150,7 +150,8 @@ exports.searchUsers = async (req, res) => {
       $or: [
         { firstName: { $regex: key, $options: "i" } },
         { lastName: { $regex: key, $options: "i" } },
-        { email: { $regex: key, $options: "i" } }
+        { email: { $regex: key, $options: "i" } },
+        { displayName: { $regex: key, $options: "i" }}
       ],
     });
 

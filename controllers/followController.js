@@ -133,6 +133,32 @@ exports.unfollow = async (req, res) => {
   }
 };
 
+exports.removeFollower = async (req, res) => {
+  try {
+    const { followerId } = req.body;
+    const user = await User.findById(followerId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Follower not found!' })
+    }
+
+    const existingFollower = await Follow.findOneAndDelete({
+      follower: user._id,
+      following: req.user._id
+    });
+
+    if (!existingFollower) {
+      return res
+        .status(400)
+        .json({ error: "Follow relationship does not exist" });
+    }
+
+    res.status(200).json({ message: "Follower removed Successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getFollowers = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

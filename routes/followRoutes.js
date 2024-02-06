@@ -8,5 +8,6 @@ router
   .use(authController.protect)
   .post("/", followController.follow)
   .post("/unfollow", followController.unfollow)
+  .post("/remove_follower", followController.removeFollower)
 
 module.exports = router;

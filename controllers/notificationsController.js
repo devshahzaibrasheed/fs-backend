@@ -13,9 +13,18 @@ exports.getNotifications = async (req, res) => {
     .limit(limit)
     .exec();
 
-    const formattedNotifications = notifications.map((notification) => ({
-      ...notification.toObject(),
-      time: timeago.format(notification.createdAt, 'en_US'),
+    const formattedNotifications = await Promise.all(notifications.map(async (notification) => {
+      const formattedNotification = {
+        ...notification.toObject(),
+        time: timeago.format(notification.createdAt, 'en_US')
+      };
+    
+      if (notification.type === "follow") {
+        const follower = await User.findById(notification.details.follower_id);
+        formattedNotification.details.follower = follower;
+      }
+
+      return formattedNotification;
     }));
 
     return res.status(200).json({ status: "success", data: formattedNotifications });

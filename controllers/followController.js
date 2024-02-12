@@ -63,10 +63,8 @@ exports.follow = async (req, res) => {
     };
 
     //Create a notification
-    const follower_name = req.user.useRealName ? `${req.user.firstName} ${req.user.lastName}` : req.user.displayName;
     const text = is_follower ? "Has followed you back" : "Has followed you";
-    const {url, image, _id} = req.user;
-    await Notification.create({user: user._id, details: {text: text, follower_name: follower_name, follower_id: _id, follower_image: image, follower_url: url}});
+    await Notification.create({user: user._id, type: 'follow', details: {text: text , follower_id: req.user._id}});
 
     res.status(201).json({ message: "Followed Successfully", user: modifiedUser });
   } catch (error) {

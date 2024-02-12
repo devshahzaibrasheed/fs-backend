@@ -11,6 +11,9 @@ const notificationSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    type: {
+      type: String
+    },
     details: {
       type: mongoose.Schema.Types.Mixed
     }

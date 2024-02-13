@@ -1,5 +1,6 @@
 const User = require("./../models/userModel");
 const Follow = require("./../models/followModel");
+const jwt = require("jsonwebtoken");
 
 exports.getUsers = async (req, res) => {
   try {
@@ -66,10 +67,9 @@ exports.getUserByUrl = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    //whether current user is following this user or not
-    const is_following = await Follow.findOne({
-      follower: req.user._id,
-      following: user._id
+    //number of followings
+    const followings_count = await Follow.countDocuments({
+      follower: user._id
     });
 
     //number of followers
@@ -77,15 +77,31 @@ exports.getUserByUrl = async (req, res) => {
       following: user._id
     });
 
+    if(!req.headers.authorization) {
+      const publicUser = {
+        ...user.toObject(),
+        followers_count,
+        followings_count
+      };
+
+      return res.status(200).json({status: "success", data: publicUser });
+    }
+
+    let token = req.headers.authorization;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const current_user = await User.findById(decoded.id);
+
+    //whether current user is following this user or not
+    const is_following = await Follow.findOne({
+      follower: current_user._id,
+      following: user._id
+    });
+
     //whether current user is followed by this user or not
     const is_follower = await Follow.findOne({
       follower: user._id,
-      following: req.user._id
-    });
-
-    //number of followings
-    const followings_count = await Follow.countDocuments({
-      follower: user._id
+      following: current_user._id
     });
 
     let following = is_following ? true : false;

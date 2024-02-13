@@ -8,6 +8,7 @@ router
   .post("/login", authController.login)
   .post("/signup", authController.register)
   .post("/forgotPassword", authController.forgotPassword)
+  .get("/url/:url", userController.getUserByUrl)
   .post("/checkValidity/:token", authController.checkValidity)
   .patch("/resetPassword/:token", authController.resetPassword)
   .post("/verify", authController.verify);
@@ -19,7 +20,6 @@ router
   .get("/search", userController.searchUsers)
   .get("/current_user", authController.currentUser)
   .patch("/update_password", authController.updatePassword)
-  .get("/url/:url", userController.getUserByUrl)
   .get("/:id", userController.getUser)
   .patch("/:id", userController.updateUser)
   .delete("/:id", userController.deleteUser)

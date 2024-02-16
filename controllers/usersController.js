@@ -61,7 +61,7 @@ exports.getUser = async (req, res) => {
 
 exports.getUserByUrl = async (req, res) => {
   try {
-    const user = await User.findOne({url: req.params.url});
+    const user = await User.findOne({url: req.params.url.toLowerCase()});
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });

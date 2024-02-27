@@ -4,9 +4,32 @@ const jwt = require("jsonwebtoken");
 
 exports.getUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    let filter = {};
+    let searchFilter = {};
 
-    return res.status(200).json({status: "success", data: users });
+    const { role, status, plan, search } = req.body;
+
+    //filters on role, status and plan
+    if (role) filter.role = role;
+    if (status) filter.userStatus = status;
+    if (plan) filter.plan = plan;
+
+    //search
+    if (search) {
+      searchFilter.$or = [
+        { firstName: { $regex: search, $options: "i" } },
+        { lastName: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { role: { $regex: search, $options: "i" } },
+        { userStatus: { $regex: search, $options: "i" } },
+        { plan: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    combinedFilter = { $and: [filter, searchFilter] };
+    const users = await User.find(combinedFilter);
+
+    return res.status(200).json({status: "success", total: users.length, data: users });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

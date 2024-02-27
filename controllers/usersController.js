@@ -7,7 +7,7 @@ exports.getUsers = async (req, res) => {
     let filter = {};
     let searchFilter = {};
 
-    const { role, status, plan, search } = req.body;
+    const { role, status, plan, search } = req.query;
 
     //filters on role, status and plan
     if (role) filter.role = role;

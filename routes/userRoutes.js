@@ -15,6 +15,7 @@ router
 
 router
   .use(authController.protect)
+  .get("/metadata", userController.metaData)
   .get("/:id/followers", followController.getFollowers)
   .get("/:id/following", followController.getFollowing)
   .get("/search", userController.searchUsers)

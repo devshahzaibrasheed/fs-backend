@@ -202,3 +202,16 @@ exports.searchUsers = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.metaData = async (req, res) => {
+  try {
+    const accounts = await User.countDocuments();
+    const subscribers = await User.countDocuments({ plan: { $in: ["pro_monthly", "pro_annually"] } });
+    const online = await User.countDocuments();
+    const verified = await User.countDocuments({ idVerified: true });
+
+    res.status(200).json({ message: "success", data: { accounts, subscribers, online, verified} });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

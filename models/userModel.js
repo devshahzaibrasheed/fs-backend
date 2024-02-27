@@ -85,6 +85,10 @@ const userSchema = new mongoose.Schema(
     useRealName: {
       type: Boolean,
       default: true
+    },
+    idVerified: {
+      type: Boolean,
+      default: false
     }
   },
   {

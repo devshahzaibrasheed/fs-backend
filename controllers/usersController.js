@@ -1,6 +1,11 @@
 const User = require("./../models/userModel");
 const Follow = require("./../models/followModel");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 
 exports.getUsers = async (req, res) => {
   try {
@@ -213,5 +218,81 @@ exports.metaData = async (req, res) => {
     res.status(200).json({ message: "success", data: { accounts, subscribers, online, verified} });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+exports.exportUsers = async (req, res, next) => {
+  const users = await User.find();
+  const selectedFields = [
+    "firstName",
+    "lastName",
+    "email",
+    "role",
+    "userStatus",
+    "plan",
+  ];
+
+  const tempDir = path.join(os.tmpdir(), "csv_exports");
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir);
+  }
+  const csvFilePath = path.join(tempDir, "users.csv");
+
+  const csvWriter = createCsvWriter({
+    path: csvFilePath,
+    header: selectedFields.map((field) => ({
+      id: field,
+      title: field.charAt(0).toUpperCase() + field.slice(1),
+    })),
+  });
+
+  const selectedUsers = users.map((user) => {
+    const selectedUser = {};
+    selectedFields.forEach((field) => {
+      selectedUser[field] = user[field];
+    });
+    return selectedUser;
+  });
+
+  csvWriter
+    .writeRecords(selectedUsers)
+    .then(() => {
+      console.log("CSV file created successfully");
+      res.sendFile(csvFilePath, {
+        headers: {
+          "Content-Disposition": `attachment; filename=users.csv`,
+        },
+      });
+    })
+    .catch((error) => {
+      console.error("Error creating CSV file:", error);
+      res.status(500).send("Internal Server Error");
+    });
+};
+
+exports.createUser = async (req, res) => {
+  try {
+    const url = crypto.randomBytes(8).toString("hex");
+    const user = new User({
+      ...req.body,
+      url: url,
+      joinedDate: new Date(),
+    });
+
+    await user.save();
+
+    res.status(201).json({ message: "User added successfully", data: user });
+  } catch (error) {
+    if (
+      error.code === 11000 &&
+      error.keyPattern &&
+      error.keyPattern.email === 1
+    ) {
+      return res.status(422).json({
+        error: "Email already exist"
+      });
+    }
+
+    res.status(422).json({ error: error.message });
   }
 };

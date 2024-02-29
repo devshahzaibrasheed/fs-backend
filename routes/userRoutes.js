@@ -17,6 +17,7 @@ router
   .use(authController.protect)
   .get("/metadata", userController.metaData)
   .get("/export", userController.exportUsers)
+  .delete("/bulk_delete", userController.deleteBulkUsers)
   .get("/:id/followers", followController.getFollowers)
   .get("/:id/following", followController.getFollowing)
   .get("/search", userController.searchUsers)

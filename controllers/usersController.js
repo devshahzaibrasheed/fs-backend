@@ -185,6 +185,21 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+exports.deleteBulkUsers = async (req, res) => {
+  try {
+    const { userIDs } = req.body;
+    const deleteResult = await User.deleteMany({ _id: { $in: userIDs } });
+
+    if (deleteResult.deletedCount > 0) {
+      res.status(200).json({ message: "Users deleted successfully" });
+    } else {
+      res.status(404).json({ message: "No users found for deletion" });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 exports.searchUsers = async (req, res) => {
   try {
     const { key } = req.query;

@@ -177,7 +177,7 @@ exports.deleteUser = async (req, res) => {
     await Follow.deleteMany({
       $or: [{ follower: user._id }, { following: user._id }]
     });
-    await Notification.deleteMany({user: user._id});
+    await Notification.deleteMany({$or: [{ user: user._id }, { senderId: user._id }]});
 
     res.status(200).json({ status: "success", message: 'Account Delete succesfully!'});
   } catch (err) {
@@ -191,6 +191,11 @@ exports.deleteBulkUsers = async (req, res) => {
     const deleteResult = await User.deleteMany({ _id: { $in: userIDs } });
 
     if (deleteResult.deletedCount > 0) {
+      await Follow.deleteMany({
+        $or: [{ follower: { $in: userIDs } }, { following: { $in: userIDs } }]
+      });
+      await Notification.deleteMany({$or: [{ user: { $in: userIDs } }, { senderId: { $in: userIDs } }]});
+
       res.status(200).json({ message: "Users deleted successfully" });
     } else {
       res.status(404).json({ message: "No users found for deletion" });

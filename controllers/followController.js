@@ -64,7 +64,7 @@ exports.follow = async (req, res) => {
 
     //Create a notification
     const text = is_follower ? "Has followed you back" : "Has followed you";
-    await Notification.create({user: user._id, type: 'follow', details: {text: text , follower_id: req.user._id}});
+    await Notification.create({user: user._id, type: 'follow', senderId: req.user._id, details: {text: text , follower_id: req.user._id}});
 
     res.status(201).json({ message: "Followed Successfully", user: modifiedUser });
   } catch (error) {

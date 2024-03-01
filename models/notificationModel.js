@@ -16,7 +16,8 @@ const notificationSchema = new mongoose.Schema(
     },
     details: {
       type: mongoose.Schema.Types.Mixed
-    }
+    },
+    senderId: String
   },
   {
     timestamps: true,

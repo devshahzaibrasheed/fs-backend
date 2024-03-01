@@ -1,5 +1,6 @@
 const User = require("./../models/userModel");
 const Follow = require("./../models/followModel");
+const Notification = require('./../models/notificationModel')
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const fs = require("fs");

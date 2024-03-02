@@ -116,6 +116,10 @@ exports.login = async (req, res) => {
       return res.status(400).json({ error: "Please verify your email before logging in!" });
     }
 
+    if (user && user.userStatus === 'banned'){
+      return res.status(400).json({ error: "You account is temporarily banned!" });
+    }
+
     if (!user || !(await user.correctPassword(password, user.password))) {
       return res.status(401).json({ error: "Incorrect email or password!" });
     }

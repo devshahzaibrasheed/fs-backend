@@ -251,7 +251,7 @@ exports.metaData = async (req, res) => {
     const subscribers = await User.countDocuments({ plan: { $in: ["pro_monthly", "pro_annually"] } });
     const online = await User.countDocuments({"recentActivity.onlineAt": { $gte: fiveMinutesAgo}});
     const verified = await User.countDocuments({ idVerified: true });
-    const joinedToday = await User.countDocuments({ joinedAt: { $gte: todayStart, $lte: todayEnd } });
+    const joinedToday = await User.countDocuments({ joinedDate: { $gte: todayStart, $lte: todayEnd } });
 
     const usersPercentage = accounts !== 0 ? Math.floor((joinedToday / accounts - joinedToday) * 100) : 0;
 

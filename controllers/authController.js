@@ -148,8 +148,11 @@ exports.protect = async (req, res, next) => {
         return res.status(401).json({ error: "User not found" });
       }
       
-      // currentUser.recentActivity.onlineAt = new Date();
-      // currentUser.save();
+      await User.findOneAndUpdate(
+        { _id: currentUser._id },
+        { "recentActivity.onlineAt": new Date() }
+      );
+
       req.user = currentUser;
       res.locals.user = currentUser;
       return next();

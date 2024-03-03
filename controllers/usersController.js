@@ -231,9 +231,11 @@ exports.searchUsers = async (req, res) => {
 
 exports.metaData = async (req, res) => {
   try {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+
     const accounts = await User.countDocuments();
     const subscribers = await User.countDocuments({ plan: { $in: ["pro_monthly", "pro_annually"] } });
-    const online = await User.countDocuments();
+    const online = await User.countDocuments({"recentActivity.onlineAt": { $gte: fiveMinutesAgo}});
     const verified = await User.countDocuments({ idVerified: true });
 
     res.status(200).json({ message: "success", data: { accounts, subscribers, online, verified} });

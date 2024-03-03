@@ -35,7 +35,17 @@ exports.getUsers = async (req, res) => {
     combinedFilter = { $and: [filter, searchFilter] };
     const users = await User.find(combinedFilter);
 
-    return res.status(200).json({status: "success", total: users.length, data: users });
+    //set online true for active users
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const usersList = users.map(user => {
+      if (user.recentActivity && user.recentActivity.onlineAt && user.recentActivity.onlineAt >= fiveMinutesAgo) {
+        return { ...user.toObject(), online: true };
+      } else {
+        return { ...user.toObject(), online: false };
+      }
+    });
+
+    return res.status(200).json({status: "success", total: users.length, data: usersList });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

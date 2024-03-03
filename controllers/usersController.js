@@ -242,13 +242,20 @@ exports.searchUsers = async (req, res) => {
 exports.metaData = async (req, res) => {
   try {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0); // Set time to the beginning of the day
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999); // set time to the end of the day
 
     const accounts = await User.countDocuments();
     const subscribers = await User.countDocuments({ plan: { $in: ["pro_monthly", "pro_annually"] } });
     const online = await User.countDocuments({"recentActivity.onlineAt": { $gte: fiveMinutesAgo}});
     const verified = await User.countDocuments({ idVerified: true });
+    const joinedToday = await User.countDocuments({ joinedAt: { $gte: todayStart, $lte: todayEnd } });
 
-    res.status(200).json({ message: "success", data: { accounts, subscribers, online, verified} });
+    const usersPercentage = totalUsers !== 0 ? Math.floor((joinedToday / totalUsers - joinedToday) * 100) : 0;
+
+    res.status(200).json({ message: "success", data: { accounts, subscribers, online, verified, usersPercentage} });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

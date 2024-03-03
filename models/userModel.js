@@ -82,6 +82,8 @@ const userSchema = new mongoose.Schema(
     currency: String,
     bio: String,
     displayName: String,
+    verifiedAt: Date,
+    subscribedAt: Date,
     useRealName: {
       type: Boolean,
       default: true

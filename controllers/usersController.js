@@ -169,6 +169,15 @@ exports.updateUser = async (req, res) => {
     }
 
     user.set(req.body);
+    if (req.body.plan && (req.body.plan === "pro_monthly" || req.body.plan === "pro_annually"))
+    {
+      user.subscribedAt = new Date();
+    }
+    if (req.body.idVerified && req.body.idVerified === true)
+    {
+      user.verifiedAt = new Date();
+    }
+
     await user.save();
 
     res.status(200).json({ message: "success", data: user });
@@ -252,10 +261,14 @@ exports.metaData = async (req, res) => {
     const online = await User.countDocuments({"recentActivity.onlineAt": { $gte: fiveMinutesAgo}});
     const verified = await User.countDocuments({ idVerified: true });
     const joinedToday = await User.countDocuments({ joinedDate: { $gte: todayStart, $lte: todayEnd } });
+    const subscribedToday = await User.countDocuments({ subscribedAt: { $gte: todayStart, $lte: todayEnd } });
+    const verifiedToday = await User.countDocuments({ verifiedAt: { $gte: todayStart, $lte: todayEnd } });
 
-    const usersPercentage = accounts !== 0 ? Math.floor((joinedToday /(accounts - joinedToday)) * 100) : 0;
+    const usersPercentage = (accounts - joinedToday) !== 0 ? Math.floor((joinedToday /(accounts - joinedToday)) * 100) : 0;
+    const subscribersPercentage = (subscribers - subscribedToday) !== 0 ? Math.floor((subscribedToday /(subscribers - joinedToday)) * 100) : 0;
+    const verifiedPercentage = (verified - verifiedToday) !== 0 ? Math.floor((verifiedToday /(verified - joinedToday)) * 100) : 0;
 
-    res.status(200).json({ message: "success", data: { accounts, subscribers, online, verified, usersPercentage} });
+    res.status(200).json({ message: "success", data: { accounts, subscribers, online, verified, usersPercentage, subscribersPercentage, verifiedPercentage} });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -318,6 +331,15 @@ exports.createUser = async (req, res) => {
       url: url,
       joinedDate: new Date(),
     });
+
+    if (req.body.plan && (req.body.plan === "pro_monthly" || req.body.plan === "pro_annually"))
+    {
+      user.subscribedAt = new Date();
+    }
+    if (req.body.idVerified && req.body.idVerified === true)
+    {
+      user.verifiedAt = new Date();
+    }
 
     await user.save();
 

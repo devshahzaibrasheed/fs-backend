@@ -267,8 +267,9 @@ exports.metaData = async (req, res) => {
     const usersPercentage = (accounts - joinedToday) !== 0 ? Math.floor((joinedToday /(accounts - joinedToday)) * 100) : 0;
     const subscribersPercentage = (subscribers - subscribedToday) !== 0 ? Math.floor((subscribedToday /(subscribers - joinedToday)) * 100) : 0;
     const verifiedPercentage = (verified - verifiedToday) !== 0 ? Math.floor((verifiedToday /(verified - joinedToday)) * 100) : 0;
+    const onlinePercentage = accounts !== 0 ? Math.floor((online / accounts) * 100) : 0;
 
-    res.status(200).json({ message: "success", data: { accounts, subscribers, online, verified, usersPercentage, subscribersPercentage, verifiedPercentage} });
+    res.status(200).json({ message: "success", data: { accounts, subscribers, online, verified, usersPercentage, subscribersPercentage, verifiedPercentage, onlinePercentage} });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

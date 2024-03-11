@@ -19,7 +19,6 @@ const signToken = (id) => {
 exports.googleLogin = async (req, res) => {
   try {
     const { access_token } = req.body
-    console.log("Access Token", access_token)
     const googleResponse = await googleStrategy.validate(access_token)
 
     const {
@@ -30,8 +29,13 @@ exports.googleLogin = async (req, res) => {
     const found = await User.findOne({email})
 
     if (found) {
-      console.log("Already Signed Up")
       const token = signToken(found._id);
+
+      //reactive user is it's inactive
+      if (found.userStatus === 'inactive') {
+        found.userStatus = 'active';
+        found.save();
+      }
       res.status(200).json({
         message: "SignIn successful",
         token: token,
@@ -126,7 +130,7 @@ exports.login = async (req, res) => {
 
     const token = signToken(user._id);
     //reactive the deactivated users active on login
-    if (user.userStatus == 'inactive') {
+    if (user.userStatus === 'inactive') {
       user.userStatus = 'active';
       user.save();
     }
@@ -343,6 +347,11 @@ exports.facebookLogin = catchAsync(async (req, res)=>{
           await user.save({ validateBeforeSave: false });
       }
       const token = signToken(user._id);
+      //reactive user is it's inactive
+      if (user.userStatus === 'inactive') {
+        user.userStatus = 'active';
+        user.save();
+      }
       res.status(200).json({
         status: "success",
         token,

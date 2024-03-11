@@ -125,6 +125,11 @@ exports.login = async (req, res) => {
     }
 
     const token = signToken(user._id);
+    //reactive the deactivated users active on login
+    if (user.userStatus == 'inactive') {
+      user.userStatus = 'active';
+      user.save();
+    }
 
     return res.status(200).json({
       message: "Logged In Successfully",

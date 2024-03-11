@@ -237,7 +237,7 @@ exports.searchUsers = async (req, res) => {
         { email: { $regex: key, $options: "i" } },
         { displayName: { $regex: key, $options: "i" }}
       ],
-      status: { $nin: ["inactive", "banned"] }
+      userStatus: { $nin: ["inactive", "banned"] }
     });
 
     res.status(200).json({

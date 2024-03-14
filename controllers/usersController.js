@@ -262,12 +262,10 @@ exports.metaData = async (req, res) => {
     const online = await User.countDocuments({"recentActivity.onlineAt": { $gte: fiveMinutesAgo}});
     const verified = await User.countDocuments({ idVerified: true });
     const joinedToday = await User.countDocuments({ joinedDate: { $gte: todayStart, $lte: todayEnd } });
-    const subscribedToday = await User.countDocuments({ subscribedAt: { $gte: todayStart, $lte: todayEnd } });
-    const verifiedToday = await User.countDocuments({ verifiedAt: { $gte: todayStart, $lte: todayEnd } });
 
     const usersPercentage = (accounts - joinedToday) !== 0 ? Math.floor((joinedToday /(accounts - joinedToday)) * 100) : 0;
-    const subscribersPercentage = (subscribers - subscribedToday) !== 0 ? Math.floor((subscribedToday /(subscribers - joinedToday)) * 100) : 0;
-    const verifiedPercentage = (verified - verifiedToday) !== 0 ? Math.floor((verifiedToday /(verified - joinedToday)) * 100) : 0;
+    const subscribersPercentage = accounts !== 0 ? Math.floor((subscribers / accounts) * 100) : 0;
+    const verifiedPercentage = accounts !== 0 ? Math.floor((verified / accounts) * 100) : 0;
     const onlinePercentage = accounts !== 0 ? Math.floor((online / accounts) * 100) : 0;
 
     res.status(200).json({ message: "success", data: { accounts, subscribers, online, verified, usersPercentage, subscribersPercentage, verifiedPercentage, onlinePercentage} });

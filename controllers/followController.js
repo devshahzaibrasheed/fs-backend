@@ -176,11 +176,16 @@ exports.getFollowers = async (req, res) => {
             follower: user._id,
             following: follower._id,
           });
+
+          const followersCount = await Follow.countDocuments({
+            following: follower._id
+          });
       
           return {
             ...follower,
             status: isFriend ? 'Friends' : 'Follow Back',
-            name: follower.useRealName ? `${follower.firstName} ${follower.lastName}` : follower.displayName
+            name: follower.useRealName ? `${follower.firstName} ${follower.lastName}` : follower.displayName,
+            followersCount
           };
         })
       );
@@ -212,10 +217,15 @@ exports.getFollowing = async (req, res) => {
             following: user._id,
           });
 
+          const followersCount = await Follow.countDocuments({
+            following: following._id
+          });
+
           return {
             ...following,
             status: isFriend ? 'Friends' : 'Following',
-            name: following.useRealName ? `${following.firstName} ${following.lastName}` : following.displayName
+            name: following.useRealName ? `${following.firstName} ${following.lastName}` : following.displayName,
+            followersCount
           };
         })
       );

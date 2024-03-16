@@ -91,6 +91,36 @@ const userSchema = new mongoose.Schema(
     idVerified: {
       type: Boolean,
       default: false
+    },
+    tabSettings: {
+      feed: {
+        type: Boolean,
+        default: true
+      },
+      exclusives: {
+        type: Boolean,
+        default: false
+      },
+      podcasts: {
+        type: Boolean,
+        default: false
+      },
+      links: {
+        type: Boolean,
+        default: false
+      },
+      appointments: {
+        type: Boolean,
+        default: false
+      },
+      products: {
+        type: Boolean,
+        default: false
+      },
+      courses: {
+        type: Boolean,
+        default: false
+      },
     }
   },
   {

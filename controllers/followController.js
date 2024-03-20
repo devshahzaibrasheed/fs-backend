@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const Follow = require("../models/followModel");
 const Notification = require("../models/notificationModel");
+const { pagination } = require("../utils/pagination");
 
 exports.follow = async (req, res) => {
   try {
@@ -234,6 +235,43 @@ exports.getFollowing = async (req, res) => {
 
     res.status(200).json({ totalFollowing, following: followingList });
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getFriends = async(req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    const { page, per_page } = req.query;
+    const { offset, limit } = pagination({ page, per_page });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found!' })
+    }
+
+    const following = await Follow.find({ follower: user._id });
+    const followingUserIds = following.map(follow => follow.following);
+
+    //total pages
+    const count = await Follow.countDocuments({
+      following: user._id,
+      follower: { $in: followingUserIds }
+    });
+    const totalPages = Math.ceil(count / limit);
+
+    // Find users who are following the specific user and are also being followed by the specific user
+    const mutualFollowers = await Follow.find({
+      following: user._id,
+      follower: { $in: followingUserIds }
+    })
+    .populate("follower", "firstName lastName image url useRealName displayName")
+    .select("-_id -following -__v")
+    .limit(limit)
+    .skip(offset);
+
+    res.status(200).json({ users: mutualFollowers, page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });
+
+  } catch(error) {
     res.status(500).json({ error: error.message });
   }
 };

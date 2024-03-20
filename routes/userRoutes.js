@@ -20,6 +20,7 @@ router
   .delete("/bulk_delete", userController.deleteBulkUsers)
   .get("/:id/followers", followController.getFollowers)
   .get("/:id/following", followController.getFollowing)
+  .get("/:id/friends", followController.getFriends)
   .get("/search", userController.searchUsers)
   .get("/current_user", authController.currentUser)
   .patch("/update_password", authController.updatePassword)

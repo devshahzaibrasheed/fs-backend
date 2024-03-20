@@ -10,6 +10,7 @@ const authController = require("./controllers/authController");
 const userRouter = require("./routes/userRoutes");
 const followRouter = require("./routes/followRoutes");
 const notificationRouter = require("./routes/notificationRoutes");
+const conversationRouter = require("./routes/conversationRoutes");
 
 const app = express();
 app.use(express.json());
@@ -22,6 +23,8 @@ database = process.env.DATABASE;
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/follows", followRouter);
 app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/conversations", conversationRouter);
+
 //google signin
 app.post('/auth/google/callback/sign-in', authController.googleLogin)
 

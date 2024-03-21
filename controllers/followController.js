@@ -269,7 +269,14 @@ exports.getFriends = async(req, res) => {
     .limit(limit)
     .skip(offset);
 
-    res.status(200).json({ users: mutualFollowers, page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });
+    const users = mutualFollowers.map(({ follower }) => ({
+      _id: follower._id,
+      fullName: follower.useRealName ? `${follower.firstName} ${follower.lastName}` : follower.displayName,
+      image: follower.image || '',
+      url: follower.url || '',
+    }));
+
+    res.status(200).json({ users: users, page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });
 
   } catch(error) {
     res.status(500).json({ error: error.message });

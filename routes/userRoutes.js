@@ -3,6 +3,7 @@ const router = express.Router();
 const authController = require("./../controllers/authController");
 const userController = require("./../controllers/usersController");
 const followController = require("./../controllers/followController");
+const conversationController = require("./../controllers/conversationsController");
 
 router
   .post("/login", authController.login)
@@ -21,6 +22,7 @@ router
   .get("/:id/followers", followController.getFollowers)
   .get("/:id/following", followController.getFollowing)
   .get("/:id/friends", followController.getFriends)
+  .get("/:id/conversations", conversationController.getConversations)
   .get("/search", userController.searchUsers)
   .get("/current_user", authController.currentUser)
   .patch("/update_password", authController.updatePassword)

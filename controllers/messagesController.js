@@ -1,5 +1,6 @@
 const Conversation = require("../models/conversationModel");
 const Message = require("../models/messageModel");
+const { pagination } = require("../utils/pagination");
 
 exports.createMessage = async (req, res) => {
   try {
@@ -24,5 +25,30 @@ exports.createMessage = async (req, res) => {
     res.status(200).json({ message });
   } catch (error) {
     res.status(500).json({ error: error.message });
-}
+  }
+};
+
+exports.getMessages = async (req, res) => {
+  try {
+    const conversation = await Conversation.findById(req.params.id);
+    const { page, per_page } = req.query;
+    const { offset, limit } = pagination({ page, per_page });
+
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found!' })
+    }
+
+    const messages = await Message.find({conversation: conversation._id})
+      .populate('sender', 'image')
+      .skip(offset)
+      .limit(limit)
+
+    //total pages
+    const count = await Message.countDocuments({conversation: conversation._id});
+    const totalPages = Math.ceil(count / limit);
+
+    res.status(200).json({ messages: messages , page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };

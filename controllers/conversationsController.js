@@ -62,6 +62,7 @@ exports.getConversations = async (req, res) => {
     conversations.forEach(conversation => {
       conversation.members.forEach(member => {
         member.recipient = member._id.toString() !== req.user._id.toString();
+        member.fullName = member.useRealName ? `${member.firstName} ${member.lastName}` : member.displayName;
       });
     });
 

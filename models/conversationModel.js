@@ -32,7 +32,9 @@ const ConversationSchema = new mongoose.Schema(
     lastMessage: {
       type: Schema.Types.ObjectId,
       ref: "Message"
-    }
+    },
+    conversationTitle: String,
+    conversationAvatar: String
   },
   {
     timestamps: true,

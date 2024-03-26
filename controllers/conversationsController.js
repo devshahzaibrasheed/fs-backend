@@ -60,10 +60,11 @@ exports.getConversations = async (req, res) => {
       .exec();
 
     conversations.forEach(conversation => {
-      conversation.members.forEach(member => {
-        member.recipient = member._id.toString() !== req.user._id.toString();
-        member.fullName = member.useRealName ? `${member.firstName} ${member.lastName}` : member.displayName;
-      });
+      if (conversation.conversationType === 'individual') {
+        const recipient = conversation.members.find(member => member._id.toString() !== req.user._id.toString());
+        conversation.conversationTitle = recipient.useRealName ? `${recipient.firstName} ${recipient.lastName}` : recipient.displayName;
+        conversation.conversationAvatar = recipient.image;
+      }
     });
 
     //total pages

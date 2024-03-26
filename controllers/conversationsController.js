@@ -26,6 +26,9 @@ exports.createConversation = async (req, res) => {
       conversation = newConversation;
     }
     await conversation.populate('members', 'firstName lastName useRealName displayName image url');
+    const recipient = conversation.members.find(member => member._id.toString() !== req.user._id.toString());
+    conversation.conversationTitle = recipient.useRealName ? `${recipient.firstName} ${recipient.lastName}` : recipient.displayName;
+    conversation.conversationAvatar = recipient.image || "";
 
     res.status(200).json({ conversation });
   } catch (error) {
@@ -63,7 +66,7 @@ exports.getConversations = async (req, res) => {
       if (conversation.conversationType === 'individual') {
         const recipient = conversation.members.find(member => member._id.toString() !== req.user._id.toString());
         conversation.conversationTitle = recipient.useRealName ? `${recipient.firstName} ${recipient.lastName}` : recipient.displayName;
-        conversation.conversationAvatar = recipient.image;
+        conversation.conversationAvatar = recipient.image || "";
       }
     });
 

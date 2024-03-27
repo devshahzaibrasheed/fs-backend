@@ -264,16 +264,19 @@ exports.getFriends = async(req, res) => {
       following: user._id,
       follower: { $in: followingUserIds }
     })
-    .populate("follower", "firstName lastName image url useRealName displayName")
+    .populate("follower", "firstName lastName image url useRealName displayName activityStatus recentActivity")
     .select("-_id -following -__v")
     .limit(limit)
     .skip(offset);
 
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     const users = mutualFollowers.map(({ follower }) => ({
       _id: follower._id,
       fullName: follower.useRealName ? `${follower.firstName} ${follower.lastName}` : follower.displayName,
       image: follower.image || '',
       url: follower.url || '',
+      activityStatus: follower.activityStatus,
+      online: follower.recentActivity && follower.recentActivity.onlineAt && follower.recentActivity.onlineAt >= fiveMinutesAgo ? true : false
     }));
 
     res.status(200).json({ users: users, page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });

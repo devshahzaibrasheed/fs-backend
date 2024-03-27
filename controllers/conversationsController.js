@@ -50,7 +50,7 @@ exports.getConversations = async (req, res) => {
     const conversations = await Conversation.find(query)
       .populate({
         path: "members",
-        select: "firstName lastName useRealName image url displayName"
+        select: "firstName lastName useRealName image url displayName activityStatus recentActivity"
       })
       .populate({
         path: "lastMessage",
@@ -65,8 +65,11 @@ exports.getConversations = async (req, res) => {
     conversations.forEach(conversation => {
       if (conversation.conversationType === 'individual') {
         const recipient = conversation.members.find(member => member._id.toString() !== req.user._id.toString());
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
         conversation.conversationTitle = recipient.useRealName ? `${recipient.firstName} ${recipient.lastName}` : recipient.displayName;
         conversation.conversationAvatar = recipient.image || "";
+        conversation.activityStatus = recipient.activityStatus;
+        conversation.online = recipient.recentActivity && recipient.recentActivity.onlineAt && recipient.recentActivity.onlineAt >= fiveMinutesAgo ? true : false
       }
     });
 

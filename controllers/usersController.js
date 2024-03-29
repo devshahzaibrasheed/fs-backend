@@ -1,6 +1,7 @@
 const User = require("./../models/userModel");
 const Follow = require("./../models/followModel");
 const Notification = require('./../models/notificationModel')
+const Conversation = require('./../models/conversationModel')
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const fs = require("fs");
@@ -146,12 +147,19 @@ exports.getUserByUrl = async (req, res) => {
     let following = is_following ? true : false;
     let follower = is_follower ? true : false;
 
+    //find conversation between both
+    const conversation = await Conversation.findOne({ 
+      members: { $all: [current_user._id, user._id] }, 
+      conversationType: "individual" 
+    });
+
     const modifiedUser = {
       ...user.toObject(),
       following,
       follower,
       followers_count,
-      followings_count
+      followings_count,
+      conversationId: conversation?._id
     };
 
     return res.status(200).json({status: "success", data: modifiedUser });

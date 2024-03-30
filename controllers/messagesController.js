@@ -64,7 +64,7 @@ exports.getMessages = async (req, res) => {
     conversation = await conversation.save();
     ////
 
-    res.status(200).json({ messages: messages , page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });
+    res.status(200).json({ messages: messages.reverse() , page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

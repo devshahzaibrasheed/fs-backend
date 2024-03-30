@@ -30,7 +30,7 @@ exports.createMessage = async (req, res) => {
 
 exports.getMessages = async (req, res) => {
   try {
-    const conversation = await Conversation.findById(req.params.id);
+    let conversation = await Conversation.findById(req.params.id);
     const { page, per_page } = req.query;
     const { offset, limit } = pagination({ page, per_page });
 
@@ -39,6 +39,7 @@ exports.getMessages = async (req, res) => {
     }
 
     const messages = await Message.find({conversation: conversation._id})
+      .sort({ createdAt: -1 })
       .populate('sender', 'image')
       .skip(offset)
       .limit(limit)
@@ -46,6 +47,22 @@ exports.getMessages = async (req, res) => {
     //total pages
     const count = await Message.countDocuments({conversation: conversation._id});
     const totalPages = Math.ceil(count / limit);
+
+    //keep track of last read message by user
+    const existingTrackIndex = conversation.messagesTrack.findIndex(
+      (existing) => existing.userId.toString() === req.user._id.toString()
+    );
+
+    if (existingTrackIndex !== -1) {
+      conversation.messagesTrack[existingTrackIndex].lastMessageSeen = messages[0]._id;
+    } else {
+      conversation.messagesTrack.push({
+        userId: req.user._id,
+        lastMessageSeen: messages[0]._id
+      });
+    }
+    conversation = await conversation.save();
+    ////
 
     res.status(200).json({ messages: messages , page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });
   } catch (error) {

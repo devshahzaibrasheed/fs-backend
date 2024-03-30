@@ -56,22 +56,42 @@ exports.getConversations = async (req, res) => {
         path: "lastMessage",
         select: "content createdAt"
       })
-      .select("-messagesTrack -__v")
+      .select("-__v")
       .skip(offset)
       .limit(limit)
       .lean()
       .exec();
 
-    conversations.forEach(conversation => {
-      if (conversation.conversationType === 'individual') {
-        const recipient = conversation.members.find(member => member._id.toString() !== req.user._id.toString());
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-        conversation.conversationTitle = recipient.useRealName ? `${recipient.firstName} ${recipient.lastName}` : recipient.displayName;
-        conversation.conversationAvatar = recipient.image || "";
-        conversation.activityStatus = recipient.activityStatus;
-        conversation.online = recipient.recentActivity && recipient.recentActivity.onlineAt && recipient.recentActivity.onlineAt >= fiveMinutesAgo ? true : false
-      }
-    });
+      for (const conversation of conversations) {
+        if (conversation.conversationType === 'individual') {
+          const recipient = conversation.members.find(member => member._id.toString() !== req.user._id.toString());
+          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+          conversation.conversationTitle = recipient.useRealName ? `${recipient.firstName} ${recipient.lastName}` : recipient.displayName;
+          conversation.conversationAvatar = recipient.image || "";
+          conversation.activityStatus = recipient.activityStatus;
+          conversation.online = recipient.recentActivity && recipient.recentActivity.onlineAt && recipient.recentActivity.onlineAt >= fiveMinutesAgo ? true : false
+        }
+        //unread messages
+        let unreadMessageCount = 0;
+        const record = conversation?.messagesTrack?.find(
+          (track) => track.userId && track.userId.toString() === req.user._id.toString()
+        );
+
+        if (record) {
+          const lastMessageSeen = await Message.findById(record.lastMessageSeen);
+          if (lastMessageSeen) {
+            unreadMessageCount = await Message.countDocuments({
+              conversation: conversation._id,
+              createdAt: { $gt: lastMessageSeen.createdAt }
+            });
+          } else {
+            unreadMessageCount = await Message.countDocuments({ conversation: conversation._id });
+          }
+        } else {
+          unreadMessageCount = await Message.countDocuments({ conversation: conversation._id });
+        }
+        conversation.unreadMessageCount = unreadMessageCount;
+    };
 
     //total pages
     const count = await Conversation.countDocuments(query);

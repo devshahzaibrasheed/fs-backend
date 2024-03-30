@@ -10,7 +10,7 @@ const ConversationSchema = new mongoose.Schema(
     ],
     messagesTrack: [
       {
-        id: {
+        userId: {
           type: Schema.Types.ObjectID,
           ref: "User"
         },

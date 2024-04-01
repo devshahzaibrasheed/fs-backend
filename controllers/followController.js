@@ -56,12 +56,19 @@ exports.follow = async (req, res) => {
     let following = is_following ? true : false;
     let follower = is_follower ? true : false;
 
+    //existing chat
+    const conversation = await Conversation.findOne({ 
+      members: { $all: [req.user._id, user._id] }, 
+      conversationType: "individual" 
+    });
+
     const modifiedUser = {
       ...user.toObject(),
       following,
       follower,
       followers_count,
-      followings_count
+      followings_count,
+      conversationId: conversation ? conversation._id : null
     };
 
     //Create a notification
@@ -119,12 +126,19 @@ exports.unfollow = async (req, res) => {
     let following = is_following ? true : false;
     let follower = is_follower ? true : false;
 
+    //existing chat
+    const conversation = await Conversation.findOne({ 
+      members: { $all: [req.user._id, user._id] }, 
+      conversationType: "individual" 
+    });
+
     const modifiedUser = {
       ...user.toObject(),
       following,
       follower,
       followers_count,
-      followings_count
+      followings_count,
+      conversationId: conversation ? conversation._id : null
     };
 
     res.status(200).json({ message: "Unfollowed Successfully", user: modifiedUser });

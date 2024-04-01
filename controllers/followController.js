@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const Follow = require("../models/followModel");
 const Notification = require("../models/notificationModel");
+const Conversation = require("../models/conversationModel");
 const { pagination } = require("../utils/pagination");
 
 exports.follow = async (req, res) => {
@@ -270,13 +271,21 @@ exports.getFriends = async(req, res) => {
     .skip(offset);
 
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    const users = mutualFollowers.map(({ follower }) => ({
-      _id: follower._id,
-      fullName: follower.useRealName ? `${follower.firstName} ${follower.lastName}` : follower.displayName,
-      image: follower.image || '',
-      url: follower.url || '',
-      activityStatus: follower.activityStatus,
-      online: follower.recentActivity && follower.recentActivity.onlineAt && follower.recentActivity.onlineAt >= fiveMinutesAgo ? true : false
+    const users = await Promise.all(mutualFollowers.map(async ({ follower }) => {
+      const conversation = await Conversation.findOne({ 
+        members: { $all: [req.user._id, follower._id] }, 
+        conversationType: "individual" 
+      });
+      
+      return {
+        _id: follower._id,
+        fullName: follower.useRealName ? `${follower.firstName} ${follower.lastName}` : follower.displayName,
+        image: follower.image || '',
+        url: follower.url || '',
+        activityStatus: follower.activityStatus,
+        online: follower.recentActivity && follower.recentActivity.onlineAt && follower.recentActivity.onlineAt >= fiveMinutesAgo ? true : false,
+        conversationId: conversation ? conversation._id : null
+      };
     }));
 
     res.status(200).json({ users: users, page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });

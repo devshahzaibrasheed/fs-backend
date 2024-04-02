@@ -57,6 +57,7 @@ exports.getConversations = async (req, res) => {
         select: "content createdAt"
       })
       .select("-__v")
+      .sort({ lastMessage: -1 })
       .skip(offset)
       .limit(limit)
       .lean()

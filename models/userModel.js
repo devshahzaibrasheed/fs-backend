@@ -121,6 +121,28 @@ const userSchema = new mongoose.Schema(
         type: Boolean,
         default: false
       },
+    },
+    messageSettings: {
+      everyone: {
+        type: Boolean,
+        default: true
+      },
+      friends: {
+        type: Boolean,
+        default: true
+      },
+      buyers: {
+        type: Boolean,
+        default: true
+      },
+      students: {
+        type: Boolean,
+        default: true
+      },
+      none: {
+        type: Boolean,
+        default: false
+      }
     }
   },
   {

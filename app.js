@@ -56,6 +56,13 @@ io.on("connection", (socket) => {
       data: data
     });
   });
+
+  socket.on("typingStatus", (data) => {
+    socket.broadcast.emit("receiveStatus", {
+      senderId: socket.id,
+      data: data
+    });
+  });
 });
 
 //mongodb connection

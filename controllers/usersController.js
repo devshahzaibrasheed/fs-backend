@@ -150,7 +150,11 @@ exports.getUserByUrl = async (req, res) => {
     //find conversation between both
     const conversation = await Conversation.findOne({ 
       members: { $all: [current_user._id, user._id] }, 
-      conversationType: "individual" 
+      conversationType: "individual",
+      $or: [
+        { "messagesTrack.userId": current_user.id, "messagesTrack.deleted": false },
+        { "messagesTrack.userId": current_user.id, "messagesTrack.deleted": { $exists: false } }
+      ]
     });
 
     const modifiedUser = {

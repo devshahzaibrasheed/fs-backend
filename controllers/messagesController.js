@@ -38,7 +38,12 @@ exports.getMessages = async (req, res) => {
       return res.status(404).json({ error: 'Conversation not found!' })
     }
 
-    const messages = await Message.find({conversation: conversation._id})
+    const wasDeleted = conversation.messagesTrack.find((track) =>
+      track.userId.equals(req.user._id) && track.deletedAt
+    );
+    let query = wasDeleted ? {conversation: conversation._id, createdAt: { $gt: wasDeleted.deletedAt }} : {conversation: conversation._id}
+
+    const messages = await Message.find(query)
       .sort({ createdAt: -1 })
       .populate('sender', 'image')
       .skip(offset)

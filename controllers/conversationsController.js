@@ -24,6 +24,16 @@ exports.createConversation = async (req, res) => {
 
       await newConversation.save();
       conversation = newConversation;
+    } else {
+      if (conversation.messagesTrack.some(track => track.userId.equals(req.user._id))) {
+        conversation.messagesTrack.forEach(track => {
+          if (track.userId.equals(req.user._id)) {
+            track.deleted = false; 
+          }
+        });
+        
+        await conversation.save(); 
+      }
     }
     await conversation.populate('members', 'firstName lastName useRealName displayName image url');
     const recipient = conversation.members.find(member => member._id.toString() !== req.user._id.toString());
@@ -46,7 +56,13 @@ exports.getConversations = async (req, res) => {
       return res.status(404).json({ error: 'User not found!' })
     }
 
-    let query = { members: { $in: [req.params.id] } }; 
+    let query = {
+      members: { $in: [req.params.id] },
+      $or: [
+        { "messagesTrack": { $exists: false } },
+        { "messagesTrack.userId": req.params.id, $or: [{ "messagesTrack.deleted": false }, { "messagesTrack.deleted": { $exists: false } }] }
+      ]
+    };
     const conversations = await Conversation.find(query)
       .populate({
         path: "members",

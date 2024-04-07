@@ -59,7 +59,11 @@ exports.follow = async (req, res) => {
     //existing chat
     const conversation = await Conversation.findOne({ 
       members: { $all: [req.user._id, user._id] }, 
-      conversationType: "individual" 
+      conversationType: "individual",
+      $or: [
+        { "messagesTrack.userId": req.user._id, "messagesTrack.deleted": false },
+        { "messagesTrack.userId": req.user._id, "messagesTrack.deleted": { $exists: false } }
+      ]
     });
 
     const modifiedUser = {
@@ -129,7 +133,11 @@ exports.unfollow = async (req, res) => {
     //existing chat
     const conversation = await Conversation.findOne({ 
       members: { $all: [req.user._id, user._id] }, 
-      conversationType: "individual" 
+      conversationType: "individual",
+      $or: [
+        { "messagesTrack.userId": req.user._id, "messagesTrack.deleted": false },
+        { "messagesTrack.userId": req.user._id, "messagesTrack.deleted": { $exists: false } }
+      ]
     });
 
     const modifiedUser = {
@@ -288,7 +296,11 @@ exports.getFriends = async(req, res) => {
     const users = await Promise.all(mutualFollowers.map(async ({ follower }) => {
       const conversation = await Conversation.findOne({ 
         members: { $all: [req.user._id, follower._id] }, 
-        conversationType: "individual" 
+        conversationType: "individual" ,
+        $or: [
+          { "messagesTrack.userId": user._id, "messagesTrack.deleted": false },
+          { "messagesTrack.userId": user._id, "messagesTrack.deleted": { $exists: false } }
+        ]
       });
       
       return {

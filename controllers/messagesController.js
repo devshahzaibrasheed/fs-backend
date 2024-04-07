@@ -19,6 +19,20 @@ exports.createMessage = async (req, res) => {
 
     await message.save();
     conversation.lastMessage = message._id;
+
+    const existingTrackIndex = conversation.messagesTrack.findIndex(
+      (existing) => existing.userId.toString() === req.user._id.toString()
+    );
+
+    if (existingTrackIndex !== -1) {
+      conversation.messagesTrack[existingTrackIndex].lastMessageSeen = message._id;
+    } else {
+      conversation.messagesTrack.push({
+        userId: req.user._id,
+        lastMessageSeen: message._id
+      });
+    }
+
     await conversation.save();
     await message.populate('sender', 'firstName lastName useRealName displayName image url');
 

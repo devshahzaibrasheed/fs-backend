@@ -31,7 +31,7 @@ exports.createConversation = async (req, res) => {
             track.deleted = false; 
           }
         });
-        
+
         await conversation.save(); 
       }
     }
@@ -143,6 +143,37 @@ exports.deleteConversation = async (req, res) => {
     } else {
       return res.status(403).json({ error: "You are not authorized to delete this conversation" });
     }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.readConversation = async (req, res) => {
+  try {
+    const conversation = await Conversation.findById(req.params.id);
+
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    const latestMessage = await Message.findOne({conversation: conversation._id})
+    .sort({ createdAt: -1 })
+
+    const existingTrackIndex = conversation.messagesTrack.findIndex(
+      (existing) => existing.userId.toString() === req.user._id.toString()
+    );
+
+    if (existingTrackIndex !== -1) {
+      conversation.messagesTrack[existingTrackIndex].lastMessageSeen = latestMessage._id;
+    } else {
+      conversation.messagesTrack.push({
+        userId: req.user._id,
+        lastMessageSeen: latestMessage._id
+      });
+    }
+
+    await conversation.save();
+    res.status(200).json({ message: "Conversation read successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

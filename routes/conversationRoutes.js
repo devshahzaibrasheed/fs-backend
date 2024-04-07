@@ -8,6 +8,7 @@ const authController = require("../controllers/authController");
 router
   .use(authController.protect)
   .post("/", conversationController.createConversation)
+  .post("/:id/read", conversationController.readConversation)
   .get("/:id/messages", messageController.getMessages)
   .post("/:id/messages", messageController.createMessage)
   .delete("/:id", conversationController.deleteConversation)

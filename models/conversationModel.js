@@ -17,7 +17,12 @@ const ConversationSchema = new mongoose.Schema(
         lastMessageSeen: {
           type: Schema.Types.ObjectID,
           ref: "Message"
-        }
+        },
+        deleted: { 
+          type: Boolean,
+          default: false
+        },
+        deletedAt: Date
       }
     ],
     conversationType: {

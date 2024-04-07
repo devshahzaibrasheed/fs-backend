@@ -10,5 +10,6 @@ router
   .post("/", conversationController.createConversation)
   .get("/:id/messages", messageController.getMessages)
   .post("/:id/messages", messageController.createMessage)
+  .delete("/:id", conversationController.deleteConversation)
 
 module.exports = router;

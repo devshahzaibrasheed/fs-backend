@@ -104,3 +104,30 @@ exports.getConversations = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.deleteConversation = async (req, res) => {
+  try {
+    const conversation = await Conversation.findById(req.params.id);
+
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    if (conversation.members.includes(req.user.id)) {
+      const deletedByUserIndex = conversation.messagesTrack.findIndex(track => track.userId.equals(req.user.id));
+      if (deletedByUserIndex !== -1) {
+        conversation.messagesTrack[deletedByUserIndex].deletedAt = new Date();
+        conversation.messagesTrack[deletedByUserIndex].deleted = true;
+      } else {
+        conversation.messagesTrack.push({ user_id: req.user.id, deletedAt: new Date(), deleted: true });
+      }
+
+      await conversation.save();
+      return res.status(200).json({ message: "Conversation deleted successfully" });
+    } else {
+      return res.status(403).json({ error: "You are not authorized to delete this conversation" });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

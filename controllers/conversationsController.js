@@ -24,17 +24,8 @@ exports.createConversation = async (req, res) => {
 
       await newConversation.save();
       conversation = newConversation;
-    } else {
-      if (conversation.messagesTrack.some(track => track.userId.equals(req.user._id))) {
-        conversation.messagesTrack.forEach(track => {
-          if (track.userId.equals(req.user._id)) {
-            track.deleted = false; 
-          }
-        });
-
-        await conversation.save(); 
-      }
     }
+    
     await conversation.populate('members', 'firstName lastName useRealName displayName image url');
     const recipient = conversation.members.find(member => member._id.toString() !== req.user._id.toString());
     conversation.conversationTitle = recipient.useRealName ? `${recipient.firstName} ${recipient.lastName}` : recipient.displayName;
@@ -73,7 +64,7 @@ exports.getConversations = async (req, res) => {
         }
       ]
     };
-    
+
     const conversations = await Conversation.find(query)
       .populate({
         path: "members",

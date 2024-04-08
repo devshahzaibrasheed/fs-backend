@@ -33,6 +33,10 @@ exports.createMessage = async (req, res) => {
       });
     }
 
+    conversation.messagesTrack.forEach(track => {
+      track.deleted = false; 
+    });
+
     await conversation.save();
     await message.populate('sender', 'firstName lastName useRealName displayName image url');
 

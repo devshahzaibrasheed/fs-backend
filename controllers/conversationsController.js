@@ -60,9 +60,20 @@ exports.getConversations = async (req, res) => {
       members: { $in: [req.params.id] },
       $or: [
         { "messagesTrack": { $exists: false } },
-        { "messagesTrack.userId": req.params.id, $or: [{ "messagesTrack.deleted": false }, { "messagesTrack.deleted": { $exists: false } }] }
+        { 
+          "messagesTrack": { 
+            $elemMatch: { 
+              userId: req.params.id,
+              $or: [
+                { deleted: false },
+                { deleted: { $exists: false } }
+              ]
+            }
+          }
+        }
       ]
     };
+    
     const conversations = await Conversation.find(query)
       .populate({
         path: "members",

@@ -294,12 +294,22 @@ exports.getFriends = async(req, res) => {
 
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     const users = await Promise.all(mutualFollowers.map(async ({ follower }) => {
-      const conversation = await Conversation.findOne({ 
+      const conversation = await Conversation.findOne({
         members: { $all: [req.user._id, follower._id] }, 
-        conversationType: "individual" ,
+        conversationType: "individual",
         $or: [
-          { "messagesTrack.userId": user._id, "messagesTrack.deleted": false },
-          { "messagesTrack.userId": user._id, "messagesTrack.deleted": { $exists: false } }
+          { "messagesTrack": { $exists: false } },
+          { 
+            "messagesTrack": { 
+              $elemMatch: { 
+                userId: user._id,
+                $or: [
+                  { deleted: false },
+                  { deleted: { $exists: false } }
+                ]
+              }
+            }
+          }
         ]
       });
       

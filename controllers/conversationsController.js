@@ -160,6 +160,7 @@ exports.deleteConversation = async (req, res) => {
       } else {
         conversation.messagesTrack.push({ user_id: req.user.id, deletedAt: new Date(), deleted: true });
       }
+      conversation.pinnedBy = conversation.pinnedBy.filter(id => id.toString() !== req.user._id.toString());
 
       await conversation.save();
       return res.status(200).json({ message: "Conversation deleted successfully" });

@@ -48,9 +48,10 @@ exports.getConversations = async (req, res) => {
       return res.status(404).json({ error: 'User not found!' })
     }
 
-    let query = type === "pinned" ? {
+    const pin = type === "pinned" ? { $in: [req.params.id] } : { $nin: [req.params.id]}
+
+    let query = type === "all" ? {
       members: { $in: [req.params.id] },
-      pinnedBy: { $in: [req.params.id]},
       $or: [
         { "messagesTrack": { $exists: false } },
         { 
@@ -67,7 +68,7 @@ exports.getConversations = async (req, res) => {
       ]
     } : {
       members: { $in: [req.params.id] },
-      pinnedBy: { $nin: [req.params.id]},
+      pinnedBy: pin,
       $or: [
         { "messagesTrack": { $exists: false } },
         { 

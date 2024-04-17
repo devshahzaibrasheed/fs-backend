@@ -107,7 +107,8 @@ exports.getConversations = async (req, res) => {
           conversation.conversationTitle = recipient.useRealName ? `${recipient.firstName} ${recipient.lastName}` : recipient.displayName;
           conversation.conversationAvatar = recipient.image || "";
           conversation.activityStatus = recipient.activityStatus;
-          conversation.online = recipient.recentActivity && recipient.recentActivity.onlineAt && recipient.recentActivity.onlineAt >= fiveMinutesAgo ? true : false
+          conversation.online = recipient.recentActivity && recipient.recentActivity.onlineAt && recipient.recentActivity.onlineAt >= fiveMinutesAgo ? true : false;
+          conversation.pin = type === "pinned" ? true : false;
         }
         //unread messages
         let unreadMessageCount = 0;

@@ -39,7 +39,13 @@ const ConversationSchema = new mongoose.Schema(
       ref: "Message"
     },
     conversationTitle: String,
-    conversationAvatar: String
+    conversationAvatar: String,
+    pinnedBy: [
+      {
+        type: Schema.Types.ObjectID,
+        ref: "User"
+      }
+    ],
   },
   {
     timestamps: true,

@@ -42,13 +42,15 @@ exports.getConversations = async (req, res) => {
     const user = await User.findById(req.params.id);
     const { page, per_page } = req.query;
     const { offset, limit } = pagination({ page, per_page });
+    const type = req.query.type;
 
     if (!user) {
       return res.status(404).json({ error: 'User not found!' })
     }
 
-    let query = {
+    let query = type === "pinned" ? {
       members: { $in: [req.params.id] },
+      pinnedBy: { $in: [req.params.id]},
       $or: [
         { "messagesTrack": { $exists: false } },
         { 
@@ -63,7 +65,24 @@ exports.getConversations = async (req, res) => {
           }
         }
       ]
-    };
+    } : {
+      members: { $in: [req.params.id] },
+      pinnedBy: { $nin: [req.params.id]},
+      $or: [
+        { "messagesTrack": { $exists: false } },
+        { 
+          "messagesTrack": { 
+            $elemMatch: { 
+              userId: req.params.id,
+              $or: [
+                { deleted: false },
+                { deleted: { $exists: false } }
+              ]
+            }
+          }
+        }
+      ]
+    }
 
     const conversations = await Conversation.find(query)
       .populate({
@@ -176,6 +195,47 @@ exports.readConversation = async (req, res) => {
 
     await conversation.save();
     res.status(200).json({ message: "Conversation read successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.pinConversation = async (req, res) => {
+  try {
+    const conversation = await Conversation.findById(req.params.id);
+
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    // Check if the conversation is already pinned
+    if (conversation.pinnedBy.includes(req.user._id)) {
+      return res.status(400).json({ error: 'User already pinned this conversation' });
+    }
+
+    // Add the current user to the pinnedBy array
+    conversation.pinnedBy.push(req.user._id);
+    await conversation.save();
+
+    res.status(200).json({ message: "Conversation pinned successfully", conversation: conversation });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.unpinConversation = async (req, res) => {
+  try {
+    const conversation = await Conversation.findById(req.params.id);
+
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    // Remove the current user ID from the pinnedBy array
+    conversation.pinnedBy = conversation.pinnedBy.filter(id => id.toString() !== req.user._id.toString());
+    await conversation.save();
+
+    res.status(200).json({ message: "Conversation unpinned successfully", conversation: conversation });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

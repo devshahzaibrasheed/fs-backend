@@ -190,30 +190,33 @@ exports.getFollowers = async (req, res) => {
     }
 
     const followers = await Follow.find({ following: user._id })
-      .populate("follower", "firstName lastName image url useRealName displayName")
+      .populate("follower", "firstName lastName image url useRealName displayName userStatus")
       .lean();
 
-      //if the user is also following back then friends else follow back
-      const followerList = await Promise.all(
-        followers.map(async ({ follower }) => {
-          const isFriend = await Follow.findOne({
-            follower: user._id,
-            following: follower._id,
-          });
+    //filter banned users
+    const filteredFollowers = followers.filter(({ follower }) => follower.userStatus !== "banned");
 
-          const followersCount = await Follow.countDocuments({
-            following: follower._id
-          });
-      
-          return {
-            ...follower,
-            status: isFriend ? 'Friends' : 'Follow Back',
-            name: follower.useRealName ? `${follower.firstName} ${follower.lastName}` : follower.displayName,
-            followersCount
-          };
-        })
-      );
-    const totalFollowers = followers.length;
+    //if the user is also following back then friends else follow back
+    const followerList = await Promise.all(
+      filteredFollowers.map(async ({ follower }) => {
+        const isFriend = await Follow.findOne({
+          follower: user._id,
+          following: follower._id,
+        });
+
+        const followersCount = await Follow.countDocuments({
+          following: follower._id
+        });
+    
+        return {
+          ...follower,
+          status: isFriend ? 'Friends' : 'Follow Back',
+          name: follower.useRealName ? `${follower.firstName} ${follower.lastName}` : follower.displayName,
+          followersCount
+        };
+      })
+    );
+    const totalFollowers = filteredFollowers.length;
 
     res.status(200).json({ totalFollowers, followers: followerList });
   } catch (error) {
@@ -230,31 +233,34 @@ exports.getFollowing = async (req, res) => {
     }
 
     const following = await Follow.find({ follower: user._id })
-      .populate("following", "firstName lastName image url useRealName displayName")
+      .populate("following", "firstName lastName image url useRealName displayName userStatus")
       .lean();
 
-      //if the other user is also following then friends else following
-      const followingList = await Promise.all(
-        following.map(async ({ following }) => {
-          const isFriend = await Follow.findOne({
-            follower: following._id,
-            following: user._id,
-          });
+    //filter banned users
+    const filteredFollowing = following.filter(({ following }) => following.userStatus !== "banned");
 
-          const followersCount = await Follow.countDocuments({
-            following: following._id
-          });
+    //if the other user is also following then friends else following
+    const followingList = await Promise.all(
+      filteredFollowing.map(async ({ following }) => {
+        const isFriend = await Follow.findOne({
+          follower: following._id,
+          following: user._id,
+        });
 
-          return {
-            ...following,
-            status: isFriend ? 'Friends' : 'Following',
-            name: following.useRealName ? `${following.firstName} ${following.lastName}` : following.displayName,
-            followersCount
-          };
-        })
-      );
+        const followersCount = await Follow.countDocuments({
+          following: following._id
+        });
 
-    const totalFollowing = following.length;
+        return {
+          ...following,
+          status: isFriend ? 'Friends' : 'Following',
+          name: following.useRealName ? `${following.firstName} ${following.lastName}` : following.displayName,
+          followersCount
+        };
+      })
+    );
+
+    const totalFollowing = filteredFollowing.length;
 
     res.status(200).json({ totalFollowing, following: followingList });
   } catch (error) {

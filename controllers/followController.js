@@ -194,7 +194,7 @@ exports.getFollowers = async (req, res) => {
       .lean();
 
     //filter banned users
-    const filteredFollowers = followers.filter(({ follower }) => follower.userStatus !== "banned");
+    const filteredFollowers = followers.filter(({ follower }) => follower.userStatus !== "banned" || follower.userStatus !== "inactive");
 
     //if the user is also following back then friends else follow back
     const followerList = await Promise.all(
@@ -237,7 +237,7 @@ exports.getFollowing = async (req, res) => {
       .lean();
 
     //filter banned users
-    const filteredFollowing = following.filter(({ following }) => following.userStatus !== "banned");
+    const filteredFollowing = following.filter(({ following }) => following.userStatus !== "banned" || following.userStatus !== "inactive");
 
     //if the other user is also following then friends else following
     const followingList = await Promise.all(

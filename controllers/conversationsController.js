@@ -88,7 +88,7 @@ exports.getConversations = async (req, res) => {
     const conversations = await Conversation.find(query)
       .populate({
         path: "members",
-        select: "firstName lastName useRealName image url displayName activityStatus recentActivity"
+        select: "firstName lastName useRealName image url displayName activityStatus recentActivity userStatus"
       })
       .populate({
         path: "lastMessage",
@@ -110,6 +110,7 @@ exports.getConversations = async (req, res) => {
           conversation.activityStatus = recipient.activityStatus;
           conversation.online = recipient.recentActivity && recipient.recentActivity.onlineAt && recipient.recentActivity.onlineAt >= fiveMinutesAgo ? true : false;
           conversation.pin = type === "pinned" ? true : false;
+          conversation.status = recipient.userStatus;
         }
         //unread messages
         let unreadMessageCount = 0;

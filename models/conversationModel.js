@@ -38,6 +38,11 @@ const ConversationSchema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: "Message"
     },
+    status: {
+      type: String,
+      enum: ["pending", "accepted"],
+      default: "pending"
+    },
     conversationTitle: String,
     conversationAvatar: String,
     pinnedBy: [

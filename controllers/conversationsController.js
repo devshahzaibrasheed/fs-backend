@@ -198,6 +198,10 @@ exports.readConversation = async (req, res) => {
     }
 
     await conversation.save();
+
+    // Update status of all messages in the conversation as seen
+    await Message.updateMany({ conversation: conversation._id, sender: { $ne: req.user._id } }, { $set: { status: "seen" } });
+
     res.status(200).json({ message: "Conversation read successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });

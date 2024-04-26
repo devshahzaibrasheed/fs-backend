@@ -13,6 +13,7 @@ router
   .post("/:id/unpin", conversationController.unpinConversation)
   .get("/:id/messages", messageController.getMessages)
   .post("/:id/messages", messageController.createMessage)
+  .patch("/:id", conversationController.updateConversation)
   .delete("/:id", conversationController.deleteConversation)
 
 module.exports = router;

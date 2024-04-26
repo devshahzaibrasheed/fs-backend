@@ -248,3 +248,20 @@ exports.unpinConversation = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.updateConversation = async (req, res) => {
+  try {
+    const conversation = await Conversation.findById(req.params.id);
+
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    conversation.set(req.body);
+    await conversation.save();
+
+    res.status(200).json({ message: "Conversation updated successfully", conversation: conversation });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

@@ -38,7 +38,7 @@ const ConversationSchema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: "Message"
     },
-    status: {
+    state: {
       type: String,
       enum: ["pending", "accepted"],
       default: "pending"

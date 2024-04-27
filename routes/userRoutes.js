@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const authController = require("./../controllers/authController");
 const userController = require("./../controllers/usersController");
+const blockController = require("./../controllers/blocksController");
 const followController = require("./../controllers/followController");
 const conversationController = require("./../controllers/conversationsController");
 
@@ -25,6 +26,8 @@ router
   .get("/:id/conversations", conversationController.getConversations)
   .get("/search", userController.searchUsers)
   .get("/current_user", authController.currentUser)
+  .post("/block", blockController.block)
+  .post("/unblock", blockController.unblock)
   .patch("/update_password", authController.updatePassword)
   .get("/:id", userController.getUser)
   .patch("/:id", userController.updateUser)

@@ -49,40 +49,37 @@ exports.getConversations = async (req, res) => {
     }
 
     const pin = type === "pinned" ? { $in: [req.params.id] } : { $nin: [req.params.id]}
+    const subQuery = [
+      { "messagesTrack": { $exists: false } },
+      { 
+        "messagesTrack": { 
+          $elemMatch: { 
+            userId: req.params.id,
+            $or: [
+              { deleted: false },
+              { deleted: { $exists: false } }
+            ]
+          }
+        }
+      },
+      { 
+        "messagesTrack": { 
+          $not: { 
+            $elemMatch: { 
+              userId: req.params.id
+            }
+          }
+        }
+      }
+    ]
 
     let query = type === "all" ? {
       members: { $in: [req.params.id] },
-      $or: [
-        { "messagesTrack": { $exists: false } },
-        { 
-          "messagesTrack": { 
-            $elemMatch: { 
-              userId: req.params.id,
-              $or: [
-                { deleted: false },
-                { deleted: { $exists: false } }
-              ]
-            }
-          }
-        }
-      ]
+      $or: subQuery
     } : {
       members: { $in: [req.params.id] },
       pinnedBy: pin,
-      $or: [
-        { "messagesTrack": { $exists: false } },
-        { 
-          "messagesTrack": { 
-            $elemMatch: { 
-              userId: req.params.id,
-              $or: [
-                { deleted: false },
-                { deleted: { $exists: false } }
-              ]
-            }
-          }
-        }
-      ]
+      $or: subQuery
     }
 
     const conversations = await Conversation.find(query)

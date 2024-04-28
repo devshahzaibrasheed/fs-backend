@@ -63,6 +63,13 @@ io.on("connection", (socket) => {
       data: data
     });
   });
+
+  socket.on("seenMessage", (data) => {
+    socket.broadcast.emit("receiveSeenMessage", {
+      senderId: socket.id,
+      data: data
+    });
+  });
 });
 
 //mongodb connection

@@ -70,6 +70,13 @@ io.on("connection", (socket) => {
       data: data
     });
   });
+
+  socket.on("deliverMessage", (data) => {
+    socket.broadcast.emit("receiveDeliveredMessage", {
+      senderId: socket.id,
+      data: data
+    });
+  });
 });
 
 //mongodb connection

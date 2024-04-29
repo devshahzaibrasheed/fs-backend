@@ -19,6 +19,10 @@ exports.block = async (req, res) => {
 
     await Block.create({blocked: user._id, blockedBy: req.user._id})
 
+    //remove following record if blocked
+    await Follow.findOneAndDelete({ follower: user._id, following: req.user._id})
+    await Follow.findOneAndDelete({ following: user._id, follower: req.user._id})
+
     res.status(200).json({ status: "success", message: 'User blocked succesfully!'})
   } catch (err) {
     res.status(500).json({ error: err.message });

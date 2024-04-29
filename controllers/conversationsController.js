@@ -135,7 +135,13 @@ exports.getConversations = async (req, res) => {
     const count = await Conversation.countDocuments(query);
     const totalPages = Math.ceil(count / limit);
 
-    res.status(200).json({ conversations: conversations, page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });
+    //mark all received messages as delivered
+    const messagesToUpdate = await Message.find({ sender: { $ne: user._id }, status: 'sent' });
+    const updatedMessages = await Message.updateMany({ sender: { $ne: user._id }, status: 'sent'}, { $set: { status: 'delivered' } })
+    const ids = messagesToUpdate.map(message => message["conversation"].toString());
+    const uniqueIds = [...new Set(ids)];
+
+    res.status(200).json({ conversations: conversations, updatedConversations: uniqueIds, page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages });
 
   } catch(error) {
     res.status(500).json({ error: error.message });

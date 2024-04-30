@@ -102,7 +102,7 @@ exports.getConversations = async (req, res) => {
       for (const conversation of conversations) {
         if (conversation.conversationType === 'individual') {
           const recipient = conversation.members.find(member => member._id.toString() !== req.user._id.toString());
-          const blocked = await Block.findOne({$or: [{ blocked: recipient._id, blockedBy: user._id }, { blocked: user._id, blockedBy: recipient._id }]})
+          const blocked = await Block.find({$or: [{ blocked: recipient._id, blockedBy: user._id }, { blocked: user._id, blockedBy: recipient._id }]});
           const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
           conversation.recipientId = recipient._id;
           conversation.conversationTitle = recipient.useRealName ? `${recipient.firstName} ${recipient.lastName}` : recipient.displayName;
@@ -111,8 +111,8 @@ exports.getConversations = async (req, res) => {
           conversation.online = recipient.recentActivity && recipient.recentActivity.onlineAt && recipient.recentActivity.onlineAt >= fiveMinutesAgo ? true : false;
           conversation.pin = type === "pinned" ? true : false;
           conversation.status = recipient.userStatus;
-          conversation.isBlocked = blocked ? true : false;
-          conversation.blockedBy = blocked ? blocked.blockedBy.toString() : null;
+          conversation.isBlocked = blocked.length > 0 ? true : false;
+          conversation.blockedBy = blocked.length > 1 ? blocked.find(block => block.blockedBy.toString() === user._id.toString()).blockedBy : blocked['0']?.blockedBy;
         }
         //unread messages
         let unreadMessageCount = 0;

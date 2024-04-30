@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const Block = require("../models/blockModel");
+const Follow = require("../models/followModel");
 
 exports.block = async (req, res) => {
   try {

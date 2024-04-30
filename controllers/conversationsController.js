@@ -104,6 +104,7 @@ exports.getConversations = async (req, res) => {
           const recipient = conversation.members.find(member => member._id.toString() !== req.user._id.toString());
           const blocked = await Block.findOne({$or: [{ blocked: recipient._id, blockedBy: user._id }, { blocked: user._id, blockedBy: recipient._id }]})
           const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+          conversation.recipientId = recipient._id;
           conversation.conversationTitle = recipient.useRealName ? `${recipient.firstName} ${recipient.lastName}` : recipient.displayName;
           conversation.conversationAvatar = recipient.image || "";
           conversation.activityStatus = recipient.activityStatus;

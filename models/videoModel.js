@@ -12,7 +12,11 @@ const videoSchema = new mongoose.Schema(
     thumbnailUrl: String,
     description: String,
     country: String,
-    playlist: String,
+    playlists: [
+      {
+        type: String
+      }
+    ],
     category: String,
     tags: [
       {

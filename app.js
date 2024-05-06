@@ -12,6 +12,7 @@ const followRouter = require("./routes/followRoutes");
 const notificationRouter = require("./routes/notificationRoutes");
 const conversationRouter = require("./routes/conversationRoutes");
 const videoRouter = require("./routes/videoRoutes");
+const playlistRouter = require("./routes/playlistRoutes");
 
 const app = express();
 app.use(express.json());
@@ -26,6 +27,7 @@ app.use("/api/v1/follows", followRouter);
 app.use("/api/v1/notifications", notificationRouter);
 app.use("/api/v1/conversations", conversationRouter);
 app.use("/api/v1/videos", videoRouter);
+app.use("/api/v1/playlists", playlistRouter);
 
 //google signin
 app.post('/auth/google/callback/sign-in', authController.googleLogin)

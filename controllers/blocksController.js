@@ -48,3 +48,15 @@ exports.unblock = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.blockedUsers = async (req, res) => {
+  try {
+    const blockedUsers = await Block.find({ blockedBy: req.user._id })
+      .populate("blocked", "firstName lastName image url useRealName displayName")
+      .lean();
+
+    res.status(200).json({ totalCount: blockedUsers.length, data: blockedUsers})
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

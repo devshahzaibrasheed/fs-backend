@@ -55,6 +55,13 @@ exports.blockedUsers = async (req, res) => {
       .populate("blocked", "firstName lastName image url useRealName displayName")
       .lean();
 
+      blockedUsers.forEach(user => {
+        if (user.blocked && user.blocked._id) {
+          user.blocked.id = user.blocked._id.toString();
+          delete user.blocked._id;
+        }
+      });
+
     res.status(200).json({ totalCount: blockedUsers.length, data: blockedUsers})
   } catch (err) {
     res.status(500).json({ error: err.message });

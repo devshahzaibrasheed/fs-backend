@@ -58,6 +58,7 @@ exports.blockedUsers = async (req, res) => {
       blockedUsers.forEach(user => {
         if (user.blocked && user.blocked._id) {
           user.blocked.id = user.blocked._id.toString();
+          user.blocked.username = user.blocked.userRealName ? `${user.blocked.firstName} ${user.blocked.lastName}` : user.blocked.displayName;
           delete user.blocked._id;
         }
       });

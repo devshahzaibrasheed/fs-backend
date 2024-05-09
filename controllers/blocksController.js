@@ -52,18 +52,22 @@ exports.unblock = async (req, res) => {
 exports.blockedUsers = async (req, res) => {
   try {
     const blockedUsers = await Block.find({ blockedBy: req.user._id })
-      .populate("blocked", "firstName lastName image url useRealName displayName")
+      .populate("blocked", "firstName lastName image url useRealName displayName username") // Include 'username' in the population
       .lean();
 
-      blockedUsers.forEach(user => {
-        if (user.blocked && user.blocked._id) {
-          user.blocked.id = user.blocked._id.toString();
-          user.blocked.username = user.blocked.userRealName ? `${user.blocked.firstName} ${user.blocked.lastName}` : user.blocked.displayName;
-          delete user.blocked._id;
-        }
-      });
+    const modifiedBlockedUsers = blockedUsers.map(user => {
+      return {
+        firstName: user.blocked.firstName,
+        lastName: user.blocked.lastName,
+        url: user.blocked.url,
+        useRealName: user.blocked.useRealName,
+        displayName: user.blocked.displayName,
+        id: user.blocked._id.toString(), // Convert _id to string
+        username: user.blocked.useRealName ? `${user.blocked.firstName} ${user.blocked.lastName}` : user.blocked.displayName,
+      };
+    });
 
-    res.status(200).json({ totalCount: blockedUsers.length, data: blockedUsers})
+    res.status(200).json({ totalCount: modifiedBlockedUsers.length, data: modifiedBlockedUsers });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

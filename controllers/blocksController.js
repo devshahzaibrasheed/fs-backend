@@ -52,7 +52,7 @@ exports.unblock = async (req, res) => {
 exports.blockedUsers = async (req, res) => {
   try {
     const blockedUsers = await Block.find({ blockedBy: req.user._id })
-      .populate("blocked", "firstName lastName image url useRealName displayName username") // Include 'username' in the population
+      .populate("blocked", "firstName lastName image url useRealName displayName username image") // Include 'username' in the population
       .lean();
 
     const modifiedBlockedUsers = blockedUsers.map(user => {

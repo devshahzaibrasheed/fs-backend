@@ -52,7 +52,7 @@ exports.unblock = async (req, res) => {
 exports.blockedUsers = async (req, res) => {
   try {
     const blockedUsers = await Block.find({ blockedBy: req.user._id })
-      .populate("blocked", "firstName lastName image url useRealName displayName username image") // Include 'username' in the population
+      .populate("blocked", "firstName lastName image url useRealName displayName")
       .lean();
 
     const modifiedBlockedUsers = blockedUsers.map(user => {
@@ -64,6 +64,7 @@ exports.blockedUsers = async (req, res) => {
         displayName: user.blocked.displayName,
         id: user.blocked._id.toString(), // Convert _id to string
         username: user.blocked.useRealName ? `${user.blocked.firstName} ${user.blocked.lastName}` : user.blocked.displayName,
+        image: user.blocked.image
       };
     });
 

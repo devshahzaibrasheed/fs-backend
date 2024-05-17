@@ -6,6 +6,7 @@ const authController = require("../controllers/authController");
 
 router
   .use(authController.protect)
+  .get("/all", playlistController.getUserPlaylists)
   .get("/", playlistController.getAll)
   .post("/", playlistController.create)
 

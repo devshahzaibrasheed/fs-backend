@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const Playlist = require("../models/playlistModel");
+const Video = require("../models/videoModel");
 
 exports.create = async (req, res) => {
   try {
@@ -27,3 +28,22 @@ exports.getAll = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getUserPlaylists = async (req, res) => {
+  try {
+    const playlists = await Playlist.find({ user: req.user._id }).lean();
+
+    const modifiedPlaylists = await Promise.all(playlists.map(async (playlist) => {
+      const videos = await Video.find({ playlists: { $in: [playlist._id] }});
+      return {
+        ...playlist,
+        videos: videos,
+      };
+    }));
+
+    res.status(200).json({ playlists: modifiedPlaylists });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

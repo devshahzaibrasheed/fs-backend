@@ -12,10 +12,6 @@ const playlistSchema = new mongoose.Schema(
     visibility: {
       type: String,
       enum: ["public", "private", "unlisted"]
-    },
-    videoOrder: {
-      type: String,
-      enum: ["date_published_newest", "date_published_oldest", "date_added_newest", "date_added_oldest", "popular", "manual"]
     }
   },
   {

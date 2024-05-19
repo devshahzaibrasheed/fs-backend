@@ -6,6 +6,7 @@ const authController = require("../controllers/authController");
 
 router
   .use(authController.protect)
+  .get("/all", videoController.allVideos)
   .get("/", videoController.getAll)
   .get("/:id", videoController.getById)
   .post("/", videoController.create)

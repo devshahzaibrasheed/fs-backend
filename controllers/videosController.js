@@ -64,3 +64,17 @@ exports.getById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.bulkDelete = async (req, res) => {
+  try {
+    if(!req.body.videoIds) {
+      return res.status(422).json({ error: "Please provide videoIds" })
+    }
+
+    await Video.deleteMany({ _id: { $in: req.body.videoIds }})
+
+    res.status(200).json({ status: "success", message: "Videos deleted successfully!" })
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

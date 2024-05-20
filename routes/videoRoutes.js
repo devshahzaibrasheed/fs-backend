@@ -10,6 +10,7 @@ router
   .get("/", videoController.getAll)
   .get("/:id", videoController.getById)
   .post("/bulk_delete", videoController.bulkDelete)
+  .post("/bulk_update", videoController.bulkupdate)
   .post("/", videoController.create)
 
 module.exports = router;

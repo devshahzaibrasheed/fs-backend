@@ -78,3 +78,17 @@ exports.bulkDelete = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.bulkupdate = async (req, res) => {
+  try {
+    if(!req.body.videoIds || !req.body.privacy) {
+      return res.status(422).json({ error: "Please provide videoIds and privacy status" })
+    }
+
+    await Video.updateMany({ _id: { $in: req.body.videoIds } }, { $set: { privacy: req.body.privacy } });
+
+    res.status(200).json({ status: "success", message: "Videos updated successfully!" })
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

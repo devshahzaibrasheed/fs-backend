@@ -30,13 +30,13 @@ exports.allVideos = async (req, res) => {
     const { page, per_page } = req.query;
     const { offset, limit } = pagination({ page, per_page });
 
-    const videos = await Video.find()
+    const videos = await Video.find({ privacy: "public" })
     .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit);
 
     //total pages
-    const count = await Video.countDocuments();
+    const count = await Video.countDocuments({ privacy: "public" });
     const totalPages = Math.ceil(count / limit);
 
     res.status(200).json({ page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages: totalPages, videos: videos })

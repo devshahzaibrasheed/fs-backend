@@ -9,6 +9,7 @@ const playlistSchema = new mongoose.Schema(
     },
     title: String,
     description: String,
+    thumbnailUrl: String,
     visibility: {
       type: String,
       enum: ["public", "private", "unlisted"]

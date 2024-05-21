@@ -38,8 +38,9 @@ exports.getPlaylistVideos = async (req, res) => {
     }
 
     const videos = await Video.find({ playlists: { $in: [playlist._id] }});
+    const playlistWithVideos = { ...playlist.toObject(), videos, videosCount: videos.length };
 
-    res.status(200).json({ data: videos });
+    res.status(200).json({ data: playlistWithVideos });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

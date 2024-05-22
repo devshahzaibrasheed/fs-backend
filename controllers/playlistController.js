@@ -23,7 +23,15 @@ exports.getAll = async (req, res) => {
   try {
     const playlists = await Playlist.find({ user: req.user._id }).sort({ createdAt: -1 });
 
-    res.status(200).json({ playlists: playlists })
+    //include videos count of each playlist
+    const data = await Promise.all(playlists.map(async (playlist) => {
+      return {
+        ...playlist.toObject(),
+        videosCount: await Video.countDocuments({ playlists: { $in: [playlist._id] }, privacy: 'public'})
+      };
+    }));
+
+    res.status(200).json({ playlists: data })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

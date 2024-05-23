@@ -9,6 +9,10 @@ exports.create = async (req, res) => {
     video.user = req.user._id;
     await video.save();
 
+    // if(video.privacy === 'public' && video.status === 'published') {
+    //   sendNotificationToFollowers(req.user)
+    // }
+
     res.status(200).json({ message: 'Video uploaded succesfully!', video: video })
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -17,7 +21,7 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const videos = await Video.find({ user: req.user._id }).sort({ createdAt: -1 });
+    const videos = await Video.find({ user: req.params.id }).sort({ createdAt: -1 });
 
     res.status(200).json({ total: videos.length, videos: videos })
   } catch (err) {
@@ -92,3 +96,7 @@ exports.bulkupdate = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// const sendNotificationToFollowers = (user) => {
+//   const followers = Follow.find
+// }

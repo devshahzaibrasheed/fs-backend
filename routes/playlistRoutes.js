@@ -5,6 +5,9 @@ const playlistController = require("../controllers/playlistController");
 const authController = require("../controllers/authController");
 
 router
+  .get("/:id", playlistController.getPlaylistVideos)
+
+router
   .use(authController.protect)
   .get("/:id", playlistController.getPlaylistVideos)
   .get("/", playlistController.getAll)

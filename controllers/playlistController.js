@@ -21,7 +21,7 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const playlists = await Playlist.find({ user: req.user._id }).sort({ createdAt: -1 });
+    const playlists = await Playlist.find({ user: req.params.id }).sort({ createdAt: -1 });
 
     //include videos count of each playlist
     const data = await Promise.all(playlists.map(async (playlist) => {

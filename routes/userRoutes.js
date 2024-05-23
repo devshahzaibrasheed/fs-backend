@@ -5,8 +5,12 @@ const userController = require("./../controllers/usersController");
 const blockController = require("./../controllers/blocksController");
 const followController = require("./../controllers/followController");
 const conversationController = require("./../controllers/conversationsController");
+const videoController = require("./../controllers/videosController");
+const playlistController = require("./../controllers/playlistController");
 
 router
+  .get("/:id/videos", videoController.getAll)
+  .get("/:id/playlists", playlistController.getAll)
   .post("/login", authController.login)
   .post("/signup", authController.register)
   .post("/forgotPassword", authController.forgotPassword)

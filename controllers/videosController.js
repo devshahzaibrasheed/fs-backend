@@ -9,8 +9,9 @@ exports.create = async (req, res) => {
     video.user = req.user._id;
     await video.save();
 
+    //send notification to all followers
     // if(video.privacy === 'public' && video.status === 'published') {
-    //   sendNotificationToFollowers(req.user)
+    //   sendNotificationToFollowers(req.user, video)
     // }
 
     res.status(200).json({ message: 'Video uploaded succesfully!', video: video })
@@ -34,7 +35,9 @@ exports.allVideos = async (req, res) => {
     const { page, per_page } = req.query;
     const { offset, limit } = pagination({ page, per_page });
 
-    const videos = await Video.find({ privacy: "public" })
+    const query = req.query.type ? { privacy: "public", category: req.query.type } : { privacy: "public" };
+
+    const videos = await Video.find(query)
     .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit);
@@ -97,6 +100,11 @@ exports.bulkupdate = async (req, res) => {
   }
 };
 
-// const sendNotificationToFollowers = (user) => {
-//   const followers = Follow.find
+// const sendNotificationToFollowers = async (user, video) => {
+//   const followers = await Follow.find({ following: user._id });
+
+//   followers.forEach(async follower => {
+//     const text = "Has uploaded a video"
+//     await Notification.create({user: follower._id, type: 'new_video', senderId: user._id, details: {text: text , video_id: video._id}});
+//   });
 // }

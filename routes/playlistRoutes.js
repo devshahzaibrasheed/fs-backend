@@ -9,8 +9,6 @@ router
 
 router
   .use(authController.protect)
-  .get("/:id", playlistController.getPlaylistVideos)
-  .get("/", playlistController.getAll)
   .post("/", playlistController.create)
 
 module.exports = router;

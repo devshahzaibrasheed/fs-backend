@@ -11,9 +11,9 @@ exports.create = async (req, res) => {
     await video.save();
 
     // send notification to all followers
-    // if(video.privacy === 'public' && video.status === 'published') {
-    //   sendNotificationToFollowers(req.user, video)
-    // }
+    if(video.privacy === 'public' && video.status === 'published') {
+      sendNotificationToFollowers(req.user, video)
+    }
 
     res.status(200).json({ message: 'Video uploaded succesfully!', video: video })
   } catch (err) {

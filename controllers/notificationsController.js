@@ -20,8 +20,16 @@ exports.getNotifications = async (req, res) => {
       };
     
       if (notification.type === "follow") {
-        const follower = await User.findById(notification.details.follower_id);
-        formattedNotification.details.follower = follower;
+        const user = await User.findById(notification.details.follower_id);
+        formattedNotification.details.avatar = user.image;
+        formattedNotification.details.url = user.url;
+        formattedNotification.details.name = user.useRealName ? `${user.firstName} ${user.lastName}` : user.displayName
+      }
+
+      if (notification.type === "new_video") {
+        const user = await User.findById(notification.senderId);
+        formattedNotification.details.avatar = user.image;
+        formattedNotification.details.name = user.useRealName ? `${user.firstName} ${user.lastName}` : user.displayName
       }
 
       return formattedNotification;

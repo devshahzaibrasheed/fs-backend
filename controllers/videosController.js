@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const Video = require("../models/videoModel");
 const Follow = require("../models/followModel");
+const Notification = require("../models/notificationModel");
 const { pagination } = require("../utils/pagination");
 
 exports.create = async (req, res) => {
@@ -9,7 +10,7 @@ exports.create = async (req, res) => {
     video.user = req.user._id;
     await video.save();
 
-    //send notification to all followers
+    // send notification to all followers
     // if(video.privacy === 'public' && video.status === 'published') {
     //   sendNotificationToFollowers(req.user, video)
     // }
@@ -43,7 +44,7 @@ exports.allVideos = async (req, res) => {
     .limit(limit);
 
     //total pages
-    const count = await Video.countDocuments({ privacy: "public" });
+    const count = await Video.countDocuments(query);
     const totalPages = Math.ceil(count / limit);
 
     res.status(200).json({ page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages: totalPages, videos: videos })
@@ -100,11 +101,11 @@ exports.bulkupdate = async (req, res) => {
   }
 };
 
-// const sendNotificationToFollowers = async (user, video) => {
-//   const followers = await Follow.find({ following: user._id });
+const sendNotificationToFollowers = async (user, video) => {
+  const followers = await Follow.find({ following: user._id });
 
-//   followers.forEach(async follower => {
-//     const text = "Has uploaded a video"
-//     await Notification.create({user: follower._id, type: 'new_video', senderId: user._id, details: {text: text , video_id: video._id}});
-//   });
-// }
+  followers.forEach(async record => {
+    const text = "Has uploaded a video"
+    await Notification.create({user: record.follower, type: 'new_video', senderId: user._id, details: {text: text , video_id: video._id}});
+  });
+}

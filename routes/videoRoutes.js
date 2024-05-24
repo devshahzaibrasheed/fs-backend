@@ -4,6 +4,8 @@ const router = express.Router();
 const videoController = require("../controllers/videosController");
 const authController = require("../controllers/authController");
 
+router.get("/:id/fetch", videoController.getById)
+
 router
   .use(authController.protect)
   .get("/all", videoController.allVideos)

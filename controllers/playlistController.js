@@ -21,6 +21,7 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
+    const query = req.query.type === "all" ? { user: req.params.id } : { user: req.params.id, visibility: "public" };
     const playlists = await Playlist.find({ user: req.params.id }).sort({ createdAt: -1 });
 
     //include videos count of each playlist

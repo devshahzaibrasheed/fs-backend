@@ -23,7 +23,8 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const videos = await Video.find({ user: req.params.id }).sort({ createdAt: -1 });
+    const query = req.query.type === "all" ? { user: req.params.id } : { user: req.params.id, privacy: "public", status: "published" };
+    const videos = await Video.find(query).sort({ createdAt: -1 });
 
     res.status(200).json({ total: videos.length, videos: videos })
   } catch (err) {

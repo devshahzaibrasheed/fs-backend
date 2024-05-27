@@ -12,7 +12,7 @@ const playlistSchema = new mongoose.Schema(
     thumbnailUrl: String,
     visibility: {
       type: String,
-      enum: ["public", "private", "unlisted"]
+      enum: ["public", "private"]
     }
   },
   {

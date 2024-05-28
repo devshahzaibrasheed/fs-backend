@@ -102,6 +102,23 @@ exports.bulkupdate = async (req, res) => {
   }
 };
 
+exports.update = async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.id);
+
+    if (!video) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    video.set(req.body);
+    await video.save();
+
+    res.status(200).json({ message: "success", data: video });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const sendNotificationToFollowers = async (user, video) => {
   const followers = await Follow.find({ following: user._id });
 

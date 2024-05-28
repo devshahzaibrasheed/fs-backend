@@ -10,6 +10,7 @@ router
   .use(authController.protect)
   .get("/all", videoController.allVideos)
   .get("/:id", videoController.getById)
+  .patch("/:id", videoController.update)
   .post("/bulk_delete", videoController.bulkDelete)
   .post("/bulk_update", videoController.bulkupdate)
   .post("/", videoController.create)

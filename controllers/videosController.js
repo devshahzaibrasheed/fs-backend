@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const Video = require("../models/videoModel");
 const Follow = require("../models/followModel");
 const Notification = require("../models/notificationModel");
+const Comment = require("../models/commentModel");
 const { pagination } = require("../utils/pagination");
 
 exports.create = async (req, res) => {
@@ -116,6 +117,27 @@ exports.update = async (req, res) => {
     res.status(200).json({ message: "success", data: video });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getComments = async (req, res) => {
+  try {
+    const { page, per_page } = req.query;
+    const { offset, limit } = pagination({ page, per_page });
+    const query = { resourceId: req.params.id, resourceType: "Video" }
+
+    const comments = await Comment.find(query)
+    .sort({ createdAt: -1 })
+    .skip(offset)
+    .limit(limit);
+
+    //total pages
+    const count = await Comment.countDocuments(query);
+    const totalPages = Math.ceil(count / limit);
+
+    res.status(200).json({ page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages: totalPages, comments })
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 

@@ -8,6 +8,7 @@ router.get("/:id/fetch", videoController.getById)
 
 router
   .use(authController.protect)
+  .get("/:id/comments", videoController.getComments)
   .get("/all", videoController.allVideos)
   .get("/:id", videoController.getById)
   .patch("/:id", videoController.update)

@@ -127,15 +127,24 @@ exports.getComments = async (req, res) => {
     const query = { resourceId: req.params.id, resourceType: "Video" }
 
     const comments = await Comment.find(query)
+    .populate("commentBy", "firstName lastName image url useRealName displayName userStatus")
     .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit);
+
+    const commentsWithFullName = comments.map(comment => ({
+      ...comment.toObject(),
+        commentBy: {
+          ...comment.commentBy.toObject(),
+          fullName: comment.commentBy.useRealName ? `${comment.commentBy.firstName} ${comment.commentBy.lastName}` : comment.commentBy.displayName
+        }
+    }));
 
     //total pages
     const count = await Comment.countDocuments(query);
     const totalPages = Math.ceil(count / limit);
 
-    res.status(200).json({ page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages: totalPages, comments })
+    res.status(200).json({ page: parseInt(page, 10) || 1, per_page: parseInt(per_page, 10) || 10, totalPages: totalPages, comments: commentsWithFullName })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
